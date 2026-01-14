@@ -14,3 +14,30 @@ Date: 2026-01-14
 
 ### Summary:
 Enterprise Scrum Planning Poker application with real-time voting capabilities. Features include multi-login authentication (Email/Password + OAuth), room management with Moderator/Voter/Observer roles, real-time game state via Socket.io, configurable deck types (Fibonacci/T-Shirt), and polymorphic voting results calculation. Migrated from PostgreSQL to SQLite for Docker-free local development, requiring conversion of Prisma enums to string constants and JSON fields to string storage with manual serialization.
+
+## Automatic Token Refresh System
+Date: 2026-01-14
+
+### Changes:
+
+- `server/prisma/schema.prisma`: Added RefreshToken model with userId, token (unique), expiresAt fields
+- `server/src/modules/auth/auth.service.ts`: Added generateTokenResponse() with refresh token creation, refreshTokens(), revokeRefreshToken(), revokeAllUserRefreshTokens() methods
+- `server/src/modules/auth/auth.controller.ts`: Added POST /auth/refresh and POST /auth/logout endpoints, updated OAuth callbacks to include refreshToken
+- `server/src/modules/auth/dto/auth.dto.ts`: Added RefreshTokenDto class
+- `client/src/services/api.ts`: Added auto-refresh interceptor that detects 401 errors, attempts token refresh, and retries the request
+- `client/src/store/authStore.ts`: Added refreshToken to state, updated login/register to store both tokens, added setTokens() method
+- `client/src/pages/AuthCallbackPage.tsx`: Updated to handle both token and refreshToken from OAuth callback
+
+### How it works:
+1. Access token expires in ~15 minutes (configured in JWT_EXPIRES_IN)
+2. Refresh token expires in 30 days (stored in database)
+3. When access token expires (401 error), the API client automatically:
+   - Calls POST /auth/refresh with the refresh token
+   - Updates stored tokens with new access and refresh tokens
+   - Retries the original request
+4. Refresh tokens are rotated on each use (old token deleted, new one created)
+5. On logout, refresh token is revoked on server
+
+### Environment Variables:
+- JWT_SECRET: Secret for signing JWT tokens
+- JWT_EXPIRES_IN: Access token expiry (default: 15m)
