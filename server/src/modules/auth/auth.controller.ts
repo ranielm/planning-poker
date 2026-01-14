@@ -14,7 +14,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, RefreshTokenDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 
@@ -41,6 +41,24 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh access token using refresh token' })
+  @ApiResponse({ status: 200, description: 'Tokens refreshed successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
+  async refresh(@Body() dto: RefreshTokenDto) {
+    return this.authService.refreshTokens(dto.refreshToken);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout and invalidate refresh token' })
+  @ApiResponse({ status: 200, description: 'Logged out successfully' })
+  async logout(@Body() dto: RefreshTokenDto) {
+    await this.authService.revokeRefreshToken(dto.refreshToken);
+    return { success: true };
   }
 
   @Get('me')
@@ -79,7 +97,7 @@ export class AuthController {
   async githubAuthCallback(@Req() req: Request, @Res() res: Response) {
     const result = await this.authService.handleOAuthLogin(req.user as any);
     const frontendUrl = this.configService.get('FRONTEND_URL', 'http://localhost:5173');
-    res.redirect(`${frontendUrl}/auth/callback?token=${result.accessToken}`);
+    res.redirect(`${frontendUrl}/auth/callback?token=${result.accessToken}&refreshToken=${result.refreshToken}`);
   }
 
   // Google OAuth
@@ -96,6 +114,6 @@ export class AuthController {
   async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
     const result = await this.authService.handleOAuthLogin(req.user as any);
     const frontendUrl = this.configService.get('FRONTEND_URL', 'http://localhost:5173');
-    res.redirect(`${frontendUrl}/auth/callback?token=${result.accessToken}`);
+    res.redirect(`${frontendUrl}/auth/callback?token=${result.accessToken}&refreshToken=${result.refreshToken}`);
   }
 }

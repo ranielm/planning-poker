@@ -25,10 +25,11 @@ model User {
   oauthId       String? // Provider's user ID
 
   // Relations
-  sessions     Session[]
-  roomsOwned   Room[]        @relation("RoomOwner")
-  participants Participant[]
-  votes        Vote[]
+  sessions      Session[]
+  refreshTokens RefreshToken[]
+  roomsOwned    Room[]        @relation("RoomOwner")
+  participants  Participant[]
+  votes         Vote[]
 
   @@unique([oauthProvider, oauthId])
   @@index([email])
@@ -41,6 +42,20 @@ model Session {
   token     String   @unique
   userAgent String?
   ipAddress String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+// Refresh Token Model - For token refresh
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
 

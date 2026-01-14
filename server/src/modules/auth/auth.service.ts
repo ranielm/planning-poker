@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserService } from '../user/user.service';
 import { RegisterDto, LoginDto, OAuthUserDto } from './dto/auth.dto';
@@ -14,6 +15,7 @@ export interface JwtPayload {
 
 export interface TokenResponse {
   accessToken: string;
+  refreshToken: string;
   user: {
     id: string;
     email: string;
@@ -50,7 +52,7 @@ export class AuthService {
       },
     });
 
-    return this.generateTokenResponse(user);
+    return await this.generateTokenResponse(user);
   }
 
   async login(dto: LoginDto): Promise<TokenResponse> {
@@ -68,7 +70,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.generateTokenResponse(user);
+    return await this.generateTokenResponse(user);
   }
 
   async validateUser(email: string, password: string) {
@@ -127,7 +129,7 @@ export class AuthService {
       }
     }
 
-    return this.generateTokenResponse(user);
+    return await this.generateTokenResponse(user);
   }
 
   async createSession(userId: string, token: string, userAgent?: string, ipAddress?: string) {
@@ -180,15 +182,30 @@ export class AuthService {
     });
   }
 
-  private generateTokenResponse(user: { id: string; email: string; displayName: string; avatarUrl?: string | null }): TokenResponse {
+  private async generateTokenResponse(user: { id: string; email: string; displayName: string; avatarUrl?: string | null }): Promise<TokenResponse> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
       displayName: user.displayName,
     };
 
+    // Generate refresh token
+    const refreshToken = randomBytes(64).toString('hex');
+    const refreshTokenExpiry = new Date();
+    refreshTokenExpiry.setDate(refreshTokenExpiry.getDate() + 30); // 30 days
+
+    // Store refresh token in database
+    await this.prisma.refreshToken.create({
+      data: {
+        userId: user.id,
+        token: refreshToken,
+        expiresAt: refreshTokenExpiry,
+      },
+    });
+
     return {
       accessToken: this.jwtService.sign(payload),
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -196,6 +213,43 @@ export class AuthService {
         avatarUrl: user.avatarUrl || undefined,
       },
     };
+  }
+
+  async refreshTokens(refreshToken: string): Promise<TokenResponse> {
+    const storedToken = await this.prisma.refreshToken.findUnique({
+      where: { token: refreshToken },
+      include: { user: true },
+    });
+
+    if (!storedToken || storedToken.expiresAt < new Date()) {
+      // Delete expired token if exists
+      if (storedToken) {
+        await this.prisma.refreshToken.delete({
+          where: { id: storedToken.id },
+        }).catch(() => null);
+      }
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    // Delete old refresh token (rotation)
+    await this.prisma.refreshToken.delete({
+      where: { id: storedToken.id },
+    });
+
+    // Generate new tokens
+    return this.generateTokenResponse(storedToken.user);
+  }
+
+  async revokeRefreshToken(refreshToken: string) {
+    await this.prisma.refreshToken.delete({
+      where: { token: refreshToken },
+    }).catch(() => null);
+  }
+
+  async revokeAllUserRefreshTokens(userId: string) {
+    await this.prisma.refreshToken.deleteMany({
+      where: { userId },
+    });
   }
 
   verifyToken(token: string): JwtPayload {

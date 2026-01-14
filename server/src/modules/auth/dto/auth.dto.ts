@@ -60,3 +60,9 @@ export class UpdateProfileDto {
   @IsUrl()
   avatarUrl?: string;
 }
+
+export class RefreshTokenDto {
+  @ApiProperty({ example: 'your-refresh-token-here' })
+  @IsString()
+  refreshToken: string;
+}

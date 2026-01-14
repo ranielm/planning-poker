@@ -6,19 +6,20 @@ import { Loader2 } from 'lucide-react';
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { setToken } = useAuthStore();
+  const { setTokens } = useAuthStore();
 
   useEffect(() => {
     const token = searchParams.get('token');
+    const refreshToken = searchParams.get('refreshToken');
 
-    if (token) {
-      setToken(token).then(() => {
+    if (token && refreshToken) {
+      setTokens(token, refreshToken).then(() => {
         navigate('/');
       });
     } else {
       navigate('/login');
     }
-  }, [searchParams, setToken, navigate]);
+  }, [searchParams, setTokens, navigate]);
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center">

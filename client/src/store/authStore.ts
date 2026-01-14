@@ -6,6 +6,7 @@ import { api } from '../services/api';
 interface AuthState {
   user: User | null;
   token: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -13,11 +14,17 @@ interface AuthState {
   // Actions
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, displayName: string) => Promise<void>;
-  setToken: (token: string) => Promise<void>;
+  setTokens: (token: string, refreshToken: string) => Promise<void>;
   logout: () => void;
   updateProfile: (data: { displayName?: string; avatarUrl?: string }) => Promise<void>;
   checkAuth: () => Promise<void>;
   clearError: () => void;
+}
+
+interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -25,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       token: null,
+      refreshToken: null,
       isAuthenticated: false,
       isLoading: true,
       error: null,
@@ -32,10 +40,11 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await api.post<{ accessToken: string; user: User }>('/auth/login', { email, password });
-          const { accessToken, user } = response.data;
+          const response = await api.post<AuthResponse>('/auth/login', { email, password });
+          const { accessToken, refreshToken, user } = response.data;
           set({
             token: accessToken,
+            refreshToken,
             user,
             isAuthenticated: true,
             isLoading: false,
@@ -52,14 +61,15 @@ export const useAuthStore = create<AuthState>()(
       register: async (email: string, password: string, displayName: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await api.post<{ accessToken: string; user: User }>('/auth/register', {
+          const response = await api.post<AuthResponse>('/auth/register', {
             email,
             password,
             displayName,
           });
-          const { accessToken, user } = response.data;
+          const { accessToken, refreshToken, user } = response.data;
           set({
             token: accessToken,
+            refreshToken,
             user,
             isAuthenticated: true,
             isLoading: false,
@@ -73,8 +83,8 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      setToken: async (token: string) => {
-        set({ token, isLoading: true });
+      setTokens: async (token: string, refreshToken: string) => {
+        set({ token, refreshToken, isLoading: true });
         try {
           const response = await api.get<User>('/auth/me', {
             headers: { Authorization: `Bearer ${token}` },
@@ -84,9 +94,10 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
           });
-        } catch (error) {
+        } catch {
           set({
             token: null,
+            refreshToken: null,
             user: null,
             isAuthenticated: false,
             isLoading: false,
@@ -94,10 +105,20 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: () => {
+      logout: async () => {
+        const { refreshToken } = get();
+        // Revoke refresh token on server
+        if (refreshToken) {
+          try {
+            await api.post('/auth/logout', { refreshToken });
+          } catch {
+            // Ignore errors on logout
+          }
+        }
         set({
           user: null,
           token: null,
+          refreshToken: null,
           isAuthenticated: false,
           isLoading: false,
           error: null,
@@ -105,11 +126,8 @@ export const useAuthStore = create<AuthState>()(
       },
 
       updateProfile: async (data) => {
-        const { token } = get();
         try {
-          const response = await api.put<User>('/users/profile', data, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await api.put<User>('/users/profile', data);
           set({ user: response.data });
         } catch (error: any) {
           set({ error: error.response?.data?.message || 'Update failed' });
@@ -125,17 +143,16 @@ export const useAuthStore = create<AuthState>()(
         }
 
         try {
-          const response = await api.get<User>('/auth/me', {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const response = await api.get<User>('/auth/me');
           set({
             user: response.data,
             isAuthenticated: true,
             isLoading: false,
           });
-        } catch (error) {
+        } catch {
           set({
             token: null,
+            refreshToken: null,
             user: null,
             isAuthenticated: false,
             isLoading: false,
@@ -147,7 +164,10 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ token: state.token }),
+      partialize: (state) => ({
+        token: state.token,
+        refreshToken: state.refreshToken,
+      }),
       onRehydrateStorage: () => (state) => {
         // Check auth on rehydration
         state?.checkAuth();
