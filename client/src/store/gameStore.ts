@@ -26,7 +26,15 @@ interface GameStore {
 }
 
 const FIBONACCI_DECK = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, '?', '☕'];
-const TSHIRT_DECK = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕'];
+const TSHIRT_DECK = ['S', 'M', 'L', 'XL', '?', '☕']; // S=13, M=26, L=52, XL=104 SP
+
+// T-Shirt to Story Points mapping
+export const TSHIRT_TO_SP: Record<string, number> = {
+  'S': 13,
+  'M': 26,
+  'L': 52,
+  'XL': 104,
+};
 
 export const useGameStore = create<GameStore>((set, get) => ({
   gameState: null,

@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { DeckType } from '../types';
-import { Loader2, Users } from 'lucide-react';
+import { Loader2, Users, Globe, Lock } from 'lucide-react';
 import { clsx } from 'clsx';
 
 export default function CreateRoomPage() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [deckType, setDeckType] = useState<DeckType>('FIBONACCI');
+  const [isPublic, setIsPublic] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,6 +22,7 @@ export default function CreateRoomPage() {
       const response = await api.post<{ slug: string }>('/rooms', {
         name,
         deckType,
+        isPublic,
       });
       navigate(`/poker/${response.data.slug}`);
     } catch (err: any) {
@@ -101,10 +103,55 @@ export default function CreateRoomPage() {
               >
                 <h3 className="font-medium text-white">T-Shirt Sizes</h3>
                 <p className="text-sm text-slate-400 mt-1">
-                  XS, S, M, L, XL, XXL
+                  S, M, L, XL
                 </p>
                 <p className="text-xs text-slate-500 mt-2">
-                  Great for relative sizing
+                  S=13, M=26, L=52, XL=104 SP
+                </p>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-3">
+              Room Visibility
+            </label>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setIsPublic(false)}
+                className={clsx(
+                  'p-4 rounded-lg border-2 transition-all text-left',
+                  !isPublic
+                    ? 'border-primary-500 bg-primary-500/10'
+                    : 'border-slate-600 hover:border-slate-500'
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Lock className="h-5 w-5 text-slate-400" />
+                  <h3 className="font-medium text-white">Private</h3>
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Only accessible via room code
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsPublic(true)}
+                className={clsx(
+                  'p-4 rounded-lg border-2 transition-all text-left',
+                  isPublic
+                    ? 'border-primary-500 bg-primary-500/10'
+                    : 'border-slate-600 hover:border-slate-500'
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-slate-400" />
+                  <h3 className="font-medium text-white">Public</h3>
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Visible to everyone on homepage
                 </p>
               </button>
             </div>

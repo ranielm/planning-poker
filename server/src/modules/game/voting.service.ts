@@ -14,11 +14,14 @@ export interface FibonacciResult {
 
 export interface TShirtResult {
   type: 'tshirt';
-  mode: string;
-  modeCount: number;
-  distribution: Record<string, number>;
+  average: number;
+  roundedAverage: number; // Rounded to nearest T-Shirt SP value
+  roundedSize: string; // T-Shirt size (S, M, L, XL)
+  votes: number[];
+  sizeVotes: string[]; // Original size votes
+  distribution: Record<string, number>; // Distribution by size
   isConsensus: boolean;
-  consensusValue?: string;
+  consensusValue?: string; // Consensus size
   totalVotes: number;
   skippedVotes: number;
 }
@@ -28,8 +31,21 @@ export type VotingResult = FibonacciResult | TShirtResult;
 // Standard Fibonacci sequence for Planning Poker
 const FIBONACCI_SEQUENCE = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
 
-// T-Shirt size order for comparison
-const TSHIRT_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+// T-Shirt sizes and their story point values
+const TSHIRT_SIZES = ['S', 'M', 'L', 'XL'];
+const TSHIRT_TO_SP: Record<string, number> = {
+  'S': 13,
+  'M': 26,
+  'L': 52,
+  'XL': 104,
+};
+const SP_TO_TSHIRT: Record<number, string> = {
+  13: 'S',
+  26: 'M',
+  52: 'L',
+  104: 'XL',
+};
+const TSHIRT_SP_VALUES = [13, 26, 52, 104];
 
 @Injectable()
 export class VotingService {
@@ -104,10 +120,11 @@ export class VotingService {
   }
 
   /**
-   * Calculate results for T-Shirt deck (mode/majority)
+   * Calculate results for T-Shirt deck (accepts S, M, L, XL and converts to SP)
    */
   private calculateTShirtResults(votes: string[]): TShirtResult {
-    const validVotes: string[] = [];
+    const numericVotes: number[] = [];
+    const sizeVotes: string[] = [];
     const distribution: Record<string, number> = {};
     let skippedVotes = 0;
 
@@ -118,19 +135,24 @@ export class VotingService {
         continue;
       }
 
-      // Normalize to uppercase
-      const normalizedVote = vote.toUpperCase();
-      if (TSHIRT_ORDER.includes(normalizedVote)) {
-        validVotes.push(normalizedVote);
-        distribution[normalizedVote] = (distribution[normalizedVote] || 0) + 1;
+      // Check if it's a T-Shirt size
+      const upperVote = vote.toUpperCase();
+      if (TSHIRT_SIZES.includes(upperVote)) {
+        const spValue = TSHIRT_TO_SP[upperVote];
+        numericVotes.push(spValue);
+        sizeVotes.push(upperVote);
+        distribution[upperVote] = (distribution[upperVote] || 0) + 1;
       }
     }
 
-    if (validVotes.length === 0) {
+    if (numericVotes.length === 0) {
       return {
         type: 'tshirt',
-        mode: 'N/A',
-        modeCount: 0,
+        average: 0,
+        roundedAverage: 0,
+        roundedSize: 'N/A',
+        votes: [],
+        sizeVotes: [],
         distribution: {},
         isConsensus: false,
         totalVotes: votes.length,
@@ -138,33 +160,28 @@ export class VotingService {
       };
     }
 
-    // Find the mode (most frequent value)
-    let mode = '';
-    let modeCount = 0;
+    // Calculate arithmetic average of SP values
+    const sum = numericVotes.reduce((acc, val) => acc + val, 0);
+    const average = sum / numericVotes.length;
 
-    for (const [size, count] of Object.entries(distribution)) {
-      if (count > modeCount) {
-        mode = size;
-        modeCount = count;
-      } else if (count === modeCount) {
-        // If tied, prefer the larger size (conservative estimate)
-        if (TSHIRT_ORDER.indexOf(size) > TSHIRT_ORDER.indexOf(mode)) {
-          mode = size;
-        }
-      }
-    }
+    // Round to nearest T-Shirt SP value
+    const roundedAverage = this.roundToNearestTShirtSP(average);
+    const roundedSize = SP_TO_TSHIRT[roundedAverage] || 'M';
 
-    // Check for consensus
-    const uniqueVotes = [...new Set(validVotes)];
-    const isConsensus = uniqueVotes.length === 1;
+    // Check for consensus (all votes are the same size)
+    const uniqueSizes = [...new Set(sizeVotes)];
+    const isConsensus = uniqueSizes.length === 1;
 
     return {
       type: 'tshirt',
-      mode,
-      modeCount,
+      average: Math.round(average * 100) / 100,
+      roundedAverage,
+      roundedSize,
+      votes: numericVotes,
+      sizeVotes,
       distribution,
       isConsensus,
-      consensusValue: isConsensus ? uniqueVotes[0] : undefined,
+      consensusValue: isConsensus ? uniqueSizes[0] : undefined,
       totalVotes: votes.length,
       skippedVotes,
     };
@@ -189,13 +206,31 @@ export class VotingService {
   }
 
   /**
+   * Round a number to the nearest T-Shirt SP value
+   */
+  private roundToNearestTShirtSP(value: number): number {
+    let closest = TSHIRT_SP_VALUES[0];
+    let minDiff = Math.abs(value - closest);
+
+    for (const sp of TSHIRT_SP_VALUES) {
+      const diff = Math.abs(value - sp);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = sp;
+      }
+    }
+
+    return closest;
+  }
+
+  /**
    * Get the deck values based on deck type
    */
   getDeckValues(deckType: string): (string | number)[] {
     if (deckType === 'FIBONACCI') {
       return [...FIBONACCI_SEQUENCE, '?', '☕'];
     } else {
-      return [...TSHIRT_ORDER, '?', '☕'];
+      return [...TSHIRT_SIZES, '?', '☕'];
     }
   }
 
@@ -211,7 +246,8 @@ export class VotingService {
       const numValue = parseInt(value, 10);
       return !isNaN(numValue) && FIBONACCI_SEQUENCE.includes(numValue);
     } else {
-      return TSHIRT_ORDER.includes(value.toUpperCase());
+      // Accept T-Shirt sizes
+      return TSHIRT_SIZES.includes(value.toUpperCase());
     }
   }
 }

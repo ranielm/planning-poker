@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsIn, MinLength, MaxLength, Matches } from 'class-validator';
+import { IsString, IsOptional, IsIn, MinLength, MaxLength, Matches, IsBoolean } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 const DECK_TYPES = ['FIBONACCI', 'TSHIRT'] as const;
@@ -25,6 +25,11 @@ export class CreateRoomDto {
   @IsOptional()
   @IsIn(DECK_TYPES)
   deckType?: string;
+
+  @ApiPropertyOptional({ default: false, description: 'Public rooms are visible to all users' })
+  @IsOptional()
+  @IsBoolean()
+  isPublic?: boolean;
 }
 
 export class UpdateRoomDto {
@@ -43,6 +48,11 @@ export class UpdateRoomDto {
   @ApiPropertyOptional()
   @IsOptional()
   activeTopic?: any;
+
+  @ApiPropertyOptional({ description: 'Public rooms are visible to all users' })
+  @IsOptional()
+  @IsBoolean()
+  isPublic?: boolean;
 }
 
 export class JoinRoomDto {

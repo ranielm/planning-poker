@@ -16,12 +16,19 @@ import { CreateRoomDto, UpdateRoomDto, JoinRoomDto } from './dto/room.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
+  @Get('public')
+  @ApiOperation({ summary: 'Get all public rooms' })
+  @ApiResponse({ status: 200, description: 'List of public rooms' })
+  async findPublicRooms() {
+    return this.roomService.findPublicRooms();
+  }
+
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new poker room' })
   @ApiResponse({ status: 201, description: 'Room created successfully' })
   async create(
@@ -32,6 +39,8 @@ export class RoomController {
   }
 
   @Get(':slug')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get room by slug' })
   @ApiResponse({ status: 200, description: 'Room found' })
   @ApiResponse({ status: 404, description: 'Room not found' })
@@ -40,6 +49,8 @@ export class RoomController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update room settings' })
   async update(
     @Param('id') id: string,
@@ -50,6 +61,8 @@ export class RoomController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a room' })
   async delete(
     @Param('id') id: string,
@@ -59,6 +72,8 @@ export class RoomController {
   }
 
   @Post(':id/join')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Join a room' })
   async join(
     @Param('id') id: string,
@@ -69,6 +84,8 @@ export class RoomController {
   }
 
   @Post(':id/leave')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Leave a room' })
   async leave(
     @Param('id') id: string,
@@ -78,6 +95,8 @@ export class RoomController {
   }
 
   @Get(':id/participants')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get room participants' })
   async getParticipants(@Param('id') id: string) {
     return this.roomService.getParticipants(id);

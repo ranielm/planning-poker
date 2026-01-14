@@ -19,6 +19,7 @@ export class RoomService {
         name: dto.name,
         slug,
         deckType: dto.deckType || DeckType.FIBONACCI,
+        isPublic: dto.isPublic || false,
         moderatorId: userId,
         participants: {
           create: {
@@ -42,6 +43,25 @@ export class RoomService {
     });
 
     return room;
+  }
+
+  async findPublicRooms() {
+    return this.prisma.room.findMany({
+      where: {
+        isPublic: true,
+        isActive: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      include: {
+        moderator: {
+          select: { id: true, displayName: true, avatarUrl: true },
+        },
+        _count: {
+          select: { participants: true },
+        },
+      },
+    });
   }
 
   async findBySlug(slug: string) {

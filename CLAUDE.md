@@ -41,3 +41,24 @@ Date: 2026-01-14
 ### Environment Variables:
 - JWT_SECRET: Secret for signing JWT tokens
 - JWT_EXPIRES_IN: Access token expiry (default: 15m)
+
+## T-Shirt Sizes and Public/Private Rooms
+Date: 2026-01-14
+
+### T-Shirt Sizes Update:
+- `server/src/modules/game/voting.service.ts`: Updated T-Shirt deck to accept actual size labels (S, M, L, XL) instead of raw numbers. Added mapping to Story Points: S=13, M=26, L=52, XL=104. Results include both size labels and SP values.
+- `client/src/store/gameStore.ts`: Updated TSHIRT_DECK to use ['S', 'M', 'L', 'XL', '?', '☕']. Exported TSHIRT_TO_SP mapping for UI display.
+
+### Public/Private Rooms Feature:
+- `server/prisma/schema.prisma`: Added `isPublic` Boolean field to Room model (default: false), added index on isPublic
+- `server/src/modules/room/dto/room.dto.ts`: Added `isPublic` field to CreateRoomDto and UpdateRoomDto with @IsBoolean validation
+- `server/src/modules/room/room.service.ts`: Added `findPublicRooms()` method to fetch public, active rooms with moderator info and participant count
+- `server/src/modules/room/room.controller.ts`: Added GET /rooms/public endpoint (no auth required) to list public rooms
+- `client/src/pages/CreateRoomPage.tsx`: Added room visibility toggle (Private/Public) with Lock/Globe icons
+- `client/src/pages/HomePage.tsx`: Added "Public Rooms" section showing all public rooms with moderator name and participant count
+
+### How Public Rooms Work:
+1. When creating a room, user can toggle between Private (default) and Public
+2. Private rooms: Only accessible via room code/URL
+3. Public rooms: Listed on homepage, anyone can see and join them
+4. GET /rooms/public endpoint is unauthenticated, allowing visitors to see available rooms
