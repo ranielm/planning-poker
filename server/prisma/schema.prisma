@@ -1,0 +1,144 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model - Core identity
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String?  // Null if OAuth-only user
+  displayName  String
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // OAuth connections
+  oauthProvider String? // 'github', 'google', etc.
+  oauthId       String? // Provider's user ID
+
+  // Relations
+  sessions     Session[]
+  roomsOwned   Room[]        @relation("RoomOwner")
+  participants Participant[]
+  votes        Vote[]
+
+  @@unique([oauthProvider, oauthId])
+  @@index([email])
+}
+
+// Session Model - Multi-device support
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  userAgent String?
+  ipAddress String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+// Room Model - Poker Room
+model Room {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  deckType    DeckType @default(FIBONACCI)
+  moderatorId String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Current topic (stored as JSON for flexibility)
+  activeTopic Json?
+
+  // Relations
+  moderator    User          @relation("RoomOwner", fields: [moderatorId], references: [id])
+  participants Participant[]
+  votes        Vote[]
+  rounds       Round[]
+
+  @@index([slug])
+  @@index([moderatorId])
+}
+
+// Participant Model - User in a room
+model Participant {
+  id       String          @id @default(cuid())
+  userId   String
+  roomId   String
+  role     ParticipantRole @default(VOTER)
+  joinedAt DateTime        @default(now())
+
+  // Socket tracking for multi-device
+  socketIds String[] @default([])
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roomId])
+  @@index([roomId])
+}
+
+// Vote Model - Individual vote
+model Vote {
+  id        String   @id @default(cuid())
+  roomId    String
+  userId    String
+  roundId   String
+  value     String   // Stored as string to support both numeric and t-shirt
+  createdAt DateTime @default(now())
+
+  room  Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  round Round @relation(fields: [roundId], references: [id], onDelete: Cascade)
+
+  @@unique([roundId, userId])
+  @@index([roomId])
+  @@index([roundId])
+}
+
+// Round Model - A voting round within a room
+model Round {
+  id         String     @id @default(cuid())
+  roomId     String
+  topic      Json?      // Topic info including Jira data
+  phase      GamePhase  @default(VOTING)
+  revealedAt DateTime?
+  createdAt  DateTime   @default(now())
+
+  room  Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  votes Vote[]
+
+  @@index([roomId])
+}
+
+// Enums
+enum DeckType {
+  FIBONACCI
+  TSHIRT
+}
+
+enum ParticipantRole {
+  MODERATOR
+  VOTER
+  OBSERVER
+}
+
+enum GamePhase {
+  WAITING
+  VOTING
+  REVEALED
+}

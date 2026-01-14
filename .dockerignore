@@ -1,0 +1,39 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+build
+.next
+out
+
+# Development
+.git
+.gitignore
+*.md
+!README.md
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Environment files (for security)
+.env
+.env.local
+.env.*.local
+
+# Test files
+coverage
+.nyc_output
