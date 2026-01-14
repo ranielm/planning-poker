@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Search, Loader2, AlertCircle } from 'lucide-react';
 import { useJira } from '../hooks/useJira';
-import { ActiveTopic, JiraIssue } from '../types';
+import { ActiveTopic } from '../types';
 
 interface TopicPanelProps {
   currentTopic: ActiveTopic | null;

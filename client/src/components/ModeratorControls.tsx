@@ -1,4 +1,4 @@
-import { Eye, EyeOff, RotateCcw, Settings } from 'lucide-react';
+import { Eye, RotateCcw, Settings } from 'lucide-react';
 import { clsx } from 'clsx';
 import { DeckType, GamePhase } from '../types';
 

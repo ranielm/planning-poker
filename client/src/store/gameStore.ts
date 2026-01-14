@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { GameState, DeckType, ParticipantRole, ActiveTopic, CardValue } from '../types';
+import { GameState, CardValue } from '../types';
 
 interface GameStore {
   // State

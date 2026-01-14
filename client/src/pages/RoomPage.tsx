@@ -1,6 +1,5 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useGameSocket } from '../hooks/useGameSocket';
-import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
 import PokerTable from '../components/PokerTable';
 import CardDeck from '../components/CardDeck';
@@ -13,7 +12,6 @@ import { useState } from 'react';
 export default function RoomPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { user } = useAuthStore();
   const { error } = useGameStore();
   const [copied, setCopied] = useState(false);
 

@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await api.post('/auth/login', { email, password });
+          const response = await api.post<{ accessToken: string; user: User }>('/auth/login', { email, password });
           const { accessToken, user } = response.data;
           set({
             token: accessToken,
@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthState>()(
       register: async (email: string, password: string, displayName: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await api.post('/auth/register', {
+          const response = await api.post<{ accessToken: string; user: User }>('/auth/register', {
             email,
             password,
             displayName,
@@ -76,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
       setToken: async (token: string) => {
         set({ token, isLoading: true });
         try {
-          const response = await api.get('/auth/me', {
+          const response = await api.get<User>('/auth/me', {
             headers: { Authorization: `Bearer ${token}` },
           });
           set({
@@ -107,7 +107,7 @@ export const useAuthStore = create<AuthState>()(
       updateProfile: async (data) => {
         const { token } = get();
         try {
-          const response = await api.put('/users/profile', data, {
+          const response = await api.put<User>('/users/profile', data, {
             headers: { Authorization: `Bearer ${token}` },
           });
           set({ user: response.data });
@@ -125,7 +125,7 @@ export const useAuthStore = create<AuthState>()(
         }
 
         try {
-          const response = await api.get('/auth/me', {
+          const response = await api.get<User>('/auth/me', {
             headers: { Authorization: `Bearer ${token}` },
           });
           set({
