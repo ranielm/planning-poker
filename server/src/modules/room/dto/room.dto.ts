@@ -1,6 +1,8 @@
-import { IsString, IsOptional, IsEnum, MinLength, MaxLength, Matches } from 'class-validator';
+import { IsString, IsOptional, IsIn, MinLength, MaxLength, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { DeckType, ParticipantRole } from '@prisma/client';
+
+const DECK_TYPES = ['FIBONACCI', 'TSHIRT'] as const;
+const PARTICIPANT_ROLES = ['MODERATOR', 'VOTER', 'OBSERVER'] as const;
 
 export class CreateRoomDto {
   @ApiProperty({ example: 'Sprint 34 Planning' })
@@ -19,10 +21,10 @@ export class CreateRoomDto {
   @MaxLength(50)
   slug?: string;
 
-  @ApiPropertyOptional({ enum: DeckType, default: DeckType.FIBONACCI })
+  @ApiPropertyOptional({ enum: DECK_TYPES, default: 'FIBONACCI' })
   @IsOptional()
-  @IsEnum(DeckType)
-  deckType?: DeckType;
+  @IsIn(DECK_TYPES)
+  deckType?: string;
 }
 
 export class UpdateRoomDto {
@@ -33,10 +35,10 @@ export class UpdateRoomDto {
   @MaxLength(100)
   name?: string;
 
-  @ApiPropertyOptional({ enum: DeckType })
+  @ApiPropertyOptional({ enum: DECK_TYPES })
   @IsOptional()
-  @IsEnum(DeckType)
-  deckType?: DeckType;
+  @IsIn(DECK_TYPES)
+  deckType?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -44,8 +46,8 @@ export class UpdateRoomDto {
 }
 
 export class JoinRoomDto {
-  @ApiPropertyOptional({ enum: ParticipantRole, default: ParticipantRole.VOTER })
+  @ApiPropertyOptional({ enum: PARTICIPANT_ROLES, default: 'VOTER' })
   @IsOptional()
-  @IsEnum(ParticipantRole)
-  role?: ParticipantRole;
+  @IsIn(PARTICIPANT_ROLES)
+  role?: string;
 }

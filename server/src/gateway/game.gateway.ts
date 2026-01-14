@@ -15,7 +15,9 @@ import { AuthService } from '../modules/auth/auth.service';
 import { GameService, ActiveTopic } from '../modules/game/game.service';
 import { RoomService } from '../modules/room/room.service';
 import { VotingService } from '../modules/game/voting.service';
-import { DeckType, ParticipantRole } from '@prisma/client';
+// String constants for SQLite compatibility
+type DeckType = 'FIBONACCI' | 'TSHIRT';
+type ParticipantRole = 'MODERATOR' | 'VOTER' | 'OBSERVER';
 
 interface AuthenticatedSocket extends Socket {
   data: {
@@ -113,7 +115,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.roomService.joinRoom(
         room.id,
         userId,
-        data.role || ParticipantRole.VOTER,
+        data.role || 'VOTER',
       );
 
       // Add socket to participant's socket list (multi-device support)

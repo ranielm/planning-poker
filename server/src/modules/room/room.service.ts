@@ -2,7 +2,10 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateRoomDto, UpdateRoomDto } from './dto/room.dto';
 import { nanoid } from 'nanoid';
-import { DeckType, ParticipantRole } from '@prisma/client';
+
+// String constants instead of Prisma enums (for SQLite compatibility)
+const DeckType = { FIBONACCI: 'FIBONACCI', TSHIRT: 'TSHIRT' } as const;
+const ParticipantRole = { MODERATOR: 'MODERATOR', VOTER: 'VOTER', OBSERVER: 'OBSERVER' } as const;
 
 @Injectable()
 export class RoomService {
@@ -116,7 +119,7 @@ export class RoomService {
     return { success: true };
   }
 
-  async joinRoom(roomId: string, oderId: string, role: ParticipantRole = ParticipantRole.VOTER) {
+  async joinRoom(roomId: string, oderId: string, role: string = ParticipantRole.VOTER) {
     const existingParticipant = await this.prisma.participant.findUnique({
       where: {
         userId_roomId: {
@@ -152,7 +155,7 @@ export class RoomService {
     return { success: true };
   }
 
-  async updateParticipantRole(roomId: string, moderatorId: string, targetUserId: string, newRole: ParticipantRole) {
+  async updateParticipantRole(roomId: string, moderatorId: string, targetUserId: string, newRole: string) {
     const room = await this.findById(roomId);
 
     if (room.moderatorId !== moderatorId) {
@@ -181,13 +184,14 @@ export class RoomService {
       return null;
     }
 
-    const socketIds = participant.socketIds.includes(socketId)
-      ? participant.socketIds
-      : [...participant.socketIds, socketId];
+    const currentSocketIds: string[] = JSON.parse(participant.socketIds || '[]');
+    const socketIds = currentSocketIds.includes(socketId)
+      ? currentSocketIds
+      : [...currentSocketIds, socketId];
 
     return this.prisma.participant.update({
       where: { id: participant.id },
-      data: { socketIds },
+      data: { socketIds: JSON.stringify(socketIds) },
     });
   }
 
@@ -202,11 +206,12 @@ export class RoomService {
       return null;
     }
 
-    const socketIds = participant.socketIds.filter(id => id !== socketId);
+    const currentSocketIds: string[] = JSON.parse(participant.socketIds || '[]');
+    const socketIds = currentSocketIds.filter(id => id !== socketId);
 
     return this.prisma.participant.update({
       where: { id: participant.id },
-      data: { socketIds },
+      data: { socketIds: JSON.stringify(socketIds) },
     });
   }
 

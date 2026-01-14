@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { DeckType } from '@prisma/client';
 
 export interface FibonacciResult {
   type: 'fibonacci';
@@ -37,8 +36,8 @@ export class VotingService {
   /**
    * Polymorphic result calculation based on deck type
    */
-  calculateResults(deckType: DeckType, votes: string[]): VotingResult {
-    if (deckType === DeckType.FIBONACCI) {
+  calculateResults(deckType: string, votes: string[]): VotingResult {
+    if (deckType === 'FIBONACCI') {
       return this.calculateFibonacciResults(votes);
     } else {
       return this.calculateTShirtResults(votes);
@@ -192,8 +191,8 @@ export class VotingService {
   /**
    * Get the deck values based on deck type
    */
-  getDeckValues(deckType: DeckType): (string | number)[] {
-    if (deckType === DeckType.FIBONACCI) {
+  getDeckValues(deckType: string): (string | number)[] {
+    if (deckType === 'FIBONACCI') {
       return [...FIBONACCI_SEQUENCE, '?', '☕'];
     } else {
       return [...TSHIRT_ORDER, '?', '☕'];
@@ -203,12 +202,12 @@ export class VotingService {
   /**
    * Validate if a vote value is valid for the given deck type
    */
-  isValidVote(deckType: DeckType, value: string): boolean {
+  isValidVote(deckType: string, value: string): boolean {
     if (value === '?' || value === '☕') {
       return true;
     }
 
-    if (deckType === DeckType.FIBONACCI) {
+    if (deckType === 'FIBONACCI') {
       const numValue = parseInt(value, 10);
       return !isNaN(numValue) && FIBONACCI_SEQUENCE.includes(numValue);
     } else {

@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { VotingService } from './voting.service';
-import { DeckType, GamePhase, ParticipantRole } from '@prisma/client';
+
+// String constants for SQLite compatibility
+const GamePhase = { WAITING: 'WAITING', VOTING: 'VOTING', REVEALED: 'REVEALED' } as const;
+const ParticipantRole = { MODERATOR: 'MODERATOR', VOTER: 'VOTER', OBSERVER: 'OBSERVER' } as const;
 
 export interface ActiveTopic {
   title: string;
@@ -13,8 +16,8 @@ export interface ActiveTopic {
 export interface GameStateResponse {
   roomId: string;
   roomName: string;
-  phase: GamePhase;
-  deckType: DeckType;
+  phase: string;
+  deckType: string;
   activeTopic: ActiveTopic | null;
   participants: ParticipantInfo[];
   votes: VoteInfo[];
@@ -23,16 +26,16 @@ export interface GameStateResponse {
 }
 
 export interface ParticipantInfo {
-  oderId: string;
+  userId: string;
   displayName: string;
   avatarUrl: string | null;
-  role: ParticipantRole;
+  role: string;
   hasVoted: boolean;
   isOnline: boolean;
 }
 
 export interface VoteInfo {
-  oderId: string;
+  userId: string;
   value: string | null; // Null if not revealed
 }
 
@@ -73,17 +76,20 @@ export class GameService {
     const phase = currentRound?.phase || GamePhase.WAITING;
     const isRevealed = phase === GamePhase.REVEALED;
 
-    const participants: ParticipantInfo[] = room.participants.map((p) => ({
-      oderId: p.user.id,
-      displayName: p.user.displayName,
-      avatarUrl: p.user.avatarUrl,
-      role: p.role,
-      hasVoted: currentRound?.votes.some((v) => v.userId === p.userId) || false,
-      isOnline: p.socketIds.length > 0,
-    }));
+    const participants: ParticipantInfo[] = room.participants.map((p) => {
+      const socketIds: string[] = JSON.parse(p.socketIds || '[]');
+      return {
+        userId: p.user.id,
+        displayName: p.user.displayName,
+        avatarUrl: p.user.avatarUrl,
+        role: p.role,
+        hasVoted: currentRound?.votes.some((v) => v.userId === p.userId) || false,
+        isOnline: socketIds.length > 0,
+      };
+    });
 
     const votes: VoteInfo[] = currentRound?.votes.map((v) => ({
-      oderId: v.userId,
+      userId: v.userId,
       value: isRevealed ? v.value : null,
     })) || [];
 
@@ -98,7 +104,7 @@ export class GameService {
       roomName: room.name,
       phase,
       deckType: room.deckType,
-      activeTopic: room.activeTopic as ActiveTopic | null,
+      activeTopic: room.activeTopic ? JSON.parse(room.activeTopic) : null,
       participants,
       votes,
       currentRoundId: currentRound?.id || null,
@@ -132,7 +138,7 @@ export class GameService {
     const round = await this.prisma.round.create({
       data: {
         roomId,
-        topic: topic || null,
+        topic: topic ? JSON.stringify(topic) : null,
         phase: GamePhase.VOTING,
       },
     });
@@ -141,7 +147,7 @@ export class GameService {
     if (topic) {
       await this.prisma.room.update({
         where: { id: roomId },
-        data: { activeTopic: topic },
+        data: { activeTopic: JSON.stringify(topic) },
       });
     }
 
@@ -250,10 +256,11 @@ export class GameService {
     }
 
     // Create a new voting round with the same topic
-    return this.startNewRound(roomId, moderatorId, room.activeTopic as ActiveTopic | undefined);
+    const currentTopic = room.activeTopic ? JSON.parse(room.activeTopic) : undefined;
+    return this.startNewRound(roomId, moderatorId, currentTopic);
   }
 
-  async changeDeckType(roomId: string, moderatorId: string, deckType: DeckType) {
+  async changeDeckType(roomId: string, moderatorId: string, deckType: string) {
     const room = await this.prisma.room.findUnique({
       where: { id: roomId },
     });
@@ -287,7 +294,7 @@ export class GameService {
 
     return this.prisma.room.update({
       where: { id: roomId },
-      data: { activeTopic: topic },
+      data: { activeTopic: JSON.stringify(topic) },
     });
   }
 }

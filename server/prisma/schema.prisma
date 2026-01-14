@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // User Model - Core identity
@@ -55,14 +55,14 @@ model Room {
   id          String   @id @default(cuid())
   name        String
   slug        String   @unique
-  deckType    DeckType @default(FIBONACCI)
+  deckType    String   @default("FIBONACCI") // FIBONACCI or TSHIRT
   moderatorId String
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Current topic (stored as JSON for flexibility)
-  activeTopic Json?
+  // Current topic (stored as JSON string for SQLite)
+  activeTopic String?
 
   // Relations
   moderator    User          @relation("RoomOwner", fields: [moderatorId], references: [id])
@@ -76,14 +76,14 @@ model Room {
 
 // Participant Model - User in a room
 model Participant {
-  id       String          @id @default(cuid())
+  id       String   @id @default(cuid())
   userId   String
   roomId   String
-  role     ParticipantRole @default(VOTER)
-  joinedAt DateTime        @default(now())
+  role     String   @default("VOTER") // MODERATOR, VOTER, OBSERVER
+  joinedAt DateTime @default(now())
 
-  // Socket tracking for multi-device
-  socketIds String[] @default([])
+  // Socket tracking for multi-device (JSON string)
+  socketIds String @default("[]")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
@@ -112,33 +112,15 @@ model Vote {
 
 // Round Model - A voting round within a room
 model Round {
-  id         String     @id @default(cuid())
+  id         String    @id @default(cuid())
   roomId     String
-  topic      Json?      // Topic info including Jira data
-  phase      GamePhase  @default(VOTING)
+  topic      String?   // JSON string for topic info
+  phase      String    @default("VOTING") // WAITING, VOTING, REVEALED
   revealedAt DateTime?
-  createdAt  DateTime   @default(now())
+  createdAt  DateTime  @default(now())
 
   room  Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
   votes Vote[]
 
   @@index([roomId])
-}
-
-// Enums
-enum DeckType {
-  FIBONACCI
-  TSHIRT
-}
-
-enum ParticipantRole {
-  MODERATOR
-  VOTER
-  OBSERVER
-}
-
-enum GamePhase {
-  WAITING
-  VOTING
-  REVEALED
 }
