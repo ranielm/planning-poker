@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { UserPlus, Loader2 } from 'lucide-react';
+import { useI18n } from '../i18n';
+import { LanguageSelector } from '../components/LanguageSelector';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const { register, isLoading, error, clearError } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,6 +27,11 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+      {/* Language selector in top right */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
+
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -32,8 +40,8 @@ export default function RegisterPage() {
             alt="Planning Poker"
             className="h-16 w-16 mx-auto mb-4"
           />
-          <h1 className="text-3xl font-bold text-white">Create Account</h1>
-          <p className="text-slate-400 mt-2">Join your team for estimation sessions</p>
+          <h1 className="text-3xl font-bold text-white">{t.auth.register}</h1>
+          <p className="text-slate-400 mt-2">Planning Poker</p>
         </div>
 
         {/* Card */}
@@ -47,7 +55,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="displayName" className="block text-sm font-medium text-slate-300 mb-1">
-                Display Name
+                {t.auth.displayName}
               </label>
               <input
                 id="displayName"
@@ -60,14 +68,11 @@ export default function RegisterPage() {
                 className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="John Doe"
               />
-              <p className="mt-1 text-xs text-slate-500">
-                This is how your teammates will see you
-              </p>
             </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1">
-                Email
+                {t.auth.email}
               </label>
               <input
                 id="email"
@@ -82,7 +87,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">
-                Password
+                {t.auth.password}
               </label>
               <input
                 id="password"
@@ -94,9 +99,6 @@ export default function RegisterPage() {
                 className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="••••••••"
               />
-              <p className="mt-1 text-xs text-slate-500">
-                Must be at least 8 characters
-              </p>
             </div>
 
             <button
@@ -107,12 +109,12 @@ export default function RegisterPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  Creating account...
+                  {t.auth.creatingAccount}
                 </>
               ) : (
                 <>
                   <UserPlus className="h-5 w-5" />
-                  Create Account
+                  {t.auth.register}
                 </>
               )}
             </button>
@@ -120,9 +122,9 @@ export default function RegisterPage() {
 
           {/* Login link */}
           <p className="mt-6 text-center text-sm text-slate-400">
-            Already have an account?{' '}
+            {t.auth.hasAccount}{' '}
             <Link to="/login" className="text-primary-400 hover:underline">
-              Sign in
+              {t.auth.login}
             </Link>
           </p>
         </div>

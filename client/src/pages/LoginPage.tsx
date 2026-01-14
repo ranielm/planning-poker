@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Github, Mail, Loader2 } from 'lucide-react';
+import { useI18n } from '../i18n';
+import { LanguageSelector } from '../components/LanguageSelector';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const { login, isLoading, error, clearError } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,6 +32,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+      {/* Language selector in top right */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
+
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -38,7 +46,7 @@ export default function LoginPage() {
             className="h-16 w-16 mx-auto mb-4"
           />
           <h1 className="text-3xl font-bold text-white">Planning Poker</h1>
-          <p className="text-slate-400 mt-2">Sign in to start estimating</p>
+          <p className="text-slate-400 mt-2">{t.auth.login}</p>
         </div>
 
         {/* Card */}
@@ -50,7 +58,7 @@ export default function LoginPage() {
               className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
             >
               <Github className="h-5 w-5" />
-              Continue with GitHub
+              {t.auth.signInWith} GitHub
             </button>
             <button
               onClick={() => handleOAuth('google')}
@@ -74,7 +82,7 @@ export default function LoginPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Continue with Google
+              {t.auth.signInWith} Google
             </button>
           </div>
 
@@ -84,7 +92,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-slate-700" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-slate-800 text-slate-400">or</span>
+              <span className="px-2 bg-slate-800 text-slate-400">{t.common.or}</span>
             </div>
           </div>
 
@@ -98,7 +106,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1">
-                Email
+                {t.auth.email}
               </label>
               <input
                 id="email"
@@ -113,7 +121,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">
-                Password
+                {t.auth.password}
               </label>
               <input
                 id="password"
@@ -134,12 +142,12 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  Signing in...
+                  {t.auth.signingIn}
                 </>
               ) : (
                 <>
                   <Mail className="h-5 w-5" />
-                  Sign in with Email
+                  {t.auth.signInWith} Email
                 </>
               )}
             </button>
@@ -147,9 +155,9 @@ export default function LoginPage() {
 
           {/* Register link */}
           <p className="mt-6 text-center text-sm text-slate-400">
-            Don't have an account?{' '}
+            {t.auth.noAccount}{' '}
             <Link to="/register" className="text-primary-400 hover:underline">
-              Create one
+              {t.auth.register}
             </Link>
           </p>
         </div>

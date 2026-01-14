@@ -1,10 +1,13 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { LogOut, User, Plus, Home } from 'lucide-react';
+import { LanguageSelector } from './LanguageSelector';
+import { useI18n } from '../i18n';
 
 export default function Layout() {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const handleLogout = () => {
     logout();
@@ -30,19 +33,20 @@ export default function Layout() {
                 className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
               >
                 <Home className="h-4 w-4" />
-                <span>Home</span>
+                <span>{t.nav.home}</span>
               </Link>
               <Link
                 to="/create"
                 className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors"
               >
                 <Plus className="h-4 w-4" />
-                <span>New Room</span>
+                <span>{t.home.createRoom}</span>
               </Link>
             </nav>
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
+              <LanguageSelector />
               <Link
                 to="/profile"
                 className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
@@ -63,7 +67,7 @@ export default function Layout() {
                 className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
               >
                 <LogOut className="h-4 w-4" />
-                <span>Logout</span>
+                <span>{t.nav.logout}</span>
               </button>
             </div>
           </div>

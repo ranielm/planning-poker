@@ -62,3 +62,33 @@ Date: 2026-01-14
 2. Private rooms: Only accessible via room code/URL
 3. Public rooms: Listed on homepage, anyone can see and join them
 4. GET /rooms/public endpoint is unauthenticated, allowing visitors to see available rooms
+
+## Internationalization (i18n)
+Date: 2026-01-14
+
+### Overview:
+Added support for two languages: English (en-US) as default and Portuguese (pt-BR). Language preference is persisted in localStorage and auto-detected from browser settings.
+
+### Files Created:
+- `client/src/i18n/en-US.ts`: English translations
+- `client/src/i18n/pt-BR.ts`: Portuguese (Brazil) translations
+- `client/src/i18n/index.ts`: i18n context, types, and useI18n hook
+- `client/src/i18n/I18nProvider.tsx`: Provider component with language detection and persistence
+- `client/src/components/LanguageSelector.tsx`: Dropdown component for changing language
+- `client/src/utils/cn.ts`: Utility for combining classNames
+
+### Files Updated:
+- `client/src/main.tsx`: Wrapped App with I18nProvider
+- `client/src/components/Layout.tsx`: Added LanguageSelector to header, used translations
+- `client/src/pages/HomePage.tsx`: All strings translated
+- `client/src/pages/CreateRoomPage.tsx`: All strings translated
+- `client/src/pages/LoginPage.tsx`: All strings translated, added LanguageSelector
+- `client/src/pages/RegisterPage.tsx`: All strings translated, added LanguageSelector
+- `client/src/pages/AuthCallbackPage.tsx`: Loading text translated
+
+### How it works:
+1. On first visit, language is auto-detected from browser (navigator.language)
+2. If browser is pt-*, sets Portuguese; otherwise English
+3. User can change language via dropdown in header or login/register pages
+4. Preference saved in localStorage under 'planning-poker-language'
+5. Date formatting respects current language locale

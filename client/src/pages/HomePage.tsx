@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { Room } from '../types';
 import { Plus, Users, Clock, ChevronRight, Loader2, Globe, Lock } from 'lucide-react';
+import { useI18n } from '../i18n';
 
 interface PublicRoom {
   id: string;
@@ -21,6 +22,7 @@ interface PublicRoom {
 }
 
 export default function HomePage() {
+  const { t, language } = useI18n();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [publicRooms, setPublicRooms] = useState<PublicRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,7 +57,8 @@ export default function HomePage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    const locale = language === 'pt-BR' ? 'pt-BR' : 'en-US';
+    return date.toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -67,15 +70,15 @@ export default function HomePage() {
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Planning Poker</h1>
+        <h1 className="text-3xl font-bold text-white">{t.home.title}</h1>
         <p className="text-slate-400 mt-1">
-          Create or join a room to start estimating with your team
+          {t.home.subtitle}
         </p>
       </div>
 
       {/* Quick join */}
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-8">
-        <h2 className="text-lg font-semibold text-white mb-3">Join a Room</h2>
+        <h2 className="text-lg font-semibold text-white mb-3">{t.home.joinRoom}</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -90,14 +93,14 @@ export default function HomePage() {
           <input
             name="slug"
             type="text"
-            placeholder="Enter room code or URL..."
+            placeholder={t.home.enterRoomCode}
             className="flex-1 px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
           <button
             type="submit"
             className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
           >
-            Join
+            {t.common.join}
           </button>
         </form>
       </div>
@@ -106,7 +109,7 @@ export default function HomePage() {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
           <Lock className="h-5 w-5 text-slate-400" />
-          <h2 className="text-xl font-semibold text-white">Your Rooms</h2>
+          <h2 className="text-xl font-semibold text-white">{t.home.yourRooms}</h2>
         </div>
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
@@ -143,16 +146,16 @@ export default function HomePage() {
         ) : (
           <div className="text-center py-8 bg-slate-800/50 rounded-xl border border-slate-700">
             <Users className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-slate-300">No rooms yet</h3>
+            <h3 className="text-lg font-medium text-slate-300">{t.home.noRoomsYet}</h3>
             <p className="text-slate-500 mt-1">
-              Create your first room to start planning with your team
+              {t.home.noRoomsDescription}
             </p>
             <Link
               to="/create"
               className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
             >
               <Plus className="h-5 w-5" />
-              Create Room
+              {t.home.createRoom}
             </Link>
           </div>
         )}
@@ -162,7 +165,7 @@ export default function HomePage() {
       <div>
         <div className="flex items-center gap-2 mb-4">
           <Globe className="h-5 w-5 text-green-400" />
-          <h2 className="text-xl font-semibold text-white">Public Rooms</h2>
+          <h2 className="text-xl font-semibold text-white">{t.home.publicRooms}</h2>
         </div>
         {isLoadingPublic ? (
           <div className="flex items-center justify-center py-8">
@@ -184,7 +187,7 @@ export default function HomePage() {
                     <div className="flex items-center gap-4 mt-1 text-sm text-slate-400">
                       <span className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        {room._count.participants} participants
+                        {room._count.participants} {t.home.participants}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
@@ -195,7 +198,7 @@ export default function HomePage() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mt-1">
-                      by {room.moderator.displayName}
+                      {t.home.by} {room.moderator.displayName}
                     </p>
                   </div>
                   <ChevronRight className="h-5 w-5 text-slate-500 group-hover:text-green-400 transition-colors" />
@@ -206,9 +209,9 @@ export default function HomePage() {
         ) : (
           <div className="text-center py-8 bg-slate-800/50 rounded-xl border border-slate-700">
             <Globe className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-slate-300">No public rooms</h3>
+            <h3 className="text-lg font-medium text-slate-300">{t.home.noPublicRooms}</h3>
             <p className="text-slate-500 mt-1">
-              Be the first to create a public room for everyone to join
+              {t.home.noPublicRoomsDescription}
             </p>
           </div>
         )}
