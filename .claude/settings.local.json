@@ -22,7 +22,8 @@
       "Bash(npx prisma db pull:*)",
       "Bash(tasklist)",
       "Bash(git reset:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git revert:*)"
     ]
   }
 }

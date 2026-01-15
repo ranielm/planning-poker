@@ -64,7 +64,7 @@ export default function TopicPanel({
     <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur rounded-xl p-6 border border-slate-200 dark:border-slate-700">
       <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Current Topic</h3>
 
-      {currentTopic ? (
+      {currentTopic && !showForm ? (
         <div className="space-y-3">
           <div className="flex items-start gap-3">
             {currentTopic.jiraKey && (
