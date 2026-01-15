@@ -177,3 +177,28 @@ This was confusing because users selecting card "6" were actually voting "8 SP".
 
 ### Summary:
 Cards now show actual Fibonacci Story Point values (0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ?, ☕) matching standard Planning Poker conventions.
+
+## T-Shirt Deck Simplification
+Date: 2026-01-15
+
+### Overview:
+Simplified the T-Shirt deck to only 4 sizes with specific Story Point values, and improved the Joker card visual design.
+
+### Changes:
+- `client/src/store/gameStore.ts`: Updated TSHIRT_DECK to ['S', 'M', 'L', 'XL', '?', '☕'] and TSHIRT_TO_SP mapping
+- `client/src/components/Card.tsx`: Updated tshirtToSP mapping, TShirtIcon scales, and improved Joker card design with gradient background and "JOKER" label
+
+### T-Shirt Size to Story Points:
+- S (Small) = 13 SP
+- M (Medium) = 26 SP
+- L (Large) = 52 SP
+- XL (Extra Large) = 104 SP
+- ? (Joker) = Not sure
+- ☕ (Coffee) = Need a break
+
+### Visual Improvements:
+- Joker card now has a purple/pink gradient background with "JOKER" text label for better visual appeal
+- T-Shirt icon scales adjusted for the 4 sizes (S: 0.65, M: 0.75, L: 0.85, XL: 1.0)
+
+### Summary:
+The T-Shirt deck is now simpler with just 4 meaningful sizes that double in Story Points (13→26→52→104), making estimation more intuitive for teams that prefer relative sizing.

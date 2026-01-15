@@ -16,12 +16,10 @@ interface CardProps {
 
 // T-Shirt sizes to story points mapping
 const tshirtToSP: Record<string, number> = {
-  'XS': 1,
-  'S': 2,
-  'M': 5,
-  'L': 8,
-  'XL': 13,
-  'XXL': 21,
+  'S': 13,
+  'M': 26,
+  'L': 52,
+  'XL': 104,
 };
 
 // Suits rotation for visual variety
@@ -43,12 +41,10 @@ function getSuitForValue(value: string): string {
 function TShirtIcon({ size, className }: { size: string; className?: string }) {
   // Scale based on t-shirt size
   const scales: Record<string, number> = {
-    'XS': 0.5,
-    'S': 0.6,
+    'S': 0.65,
     'M': 0.75,
     'L': 0.85,
-    'XL': 0.95,
-    'XXL': 1.05,
+    'XL': 1.0,
   };
   const scale = scales[size] || 0.75;
 
@@ -79,7 +75,7 @@ export default function Card({
     lg: 'w-16 h-24',
   };
 
-  const isTShirt = deckType === 'TSHIRT' || ['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(String(value));
+  const isTShirt = deckType === 'TSHIRT' || ['S', 'M', 'L', 'XL'].includes(String(value));
   const isJoker = value === '?';
   const isCoffee = value === '☕';
 
@@ -146,9 +142,10 @@ export default function Card({
             <div className="absolute inset-[3px] rounded border border-gray-200" />
 
             {isJoker ? (
-              // Joker card
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-2xl">🃏</div>
+              // Joker card - stylized design
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
+                <div className="text-3xl">🃏</div>
+                <span className="text-[9px] font-bold text-purple-600 mt-0.5 tracking-wide">JOKER</span>
               </div>
             ) : isCoffee ? (
               // Coffee break card
