@@ -119,3 +119,29 @@ Added voting history to track previously voted stories and their results. Users 
 3. History shows: topic title (with Jira key if available), final result, vote count, and time
 4. Results are color-coded: green for consensus, yellow for no consensus
 5. Moderators can start a new round by setting a new topic after reveal
+
+## Dark/Light Theme Fix
+Date: 2026-01-15
+
+### Overview:
+Fixed the dark/light mode toggle that was not working due to invalid Tailwind CSS class usage. The code was incorrectly using `light:` as a prefix, which doesn't exist in Tailwind CSS.
+
+### Changes:
+- `client/src/components/Layout.tsx`: Replaced invalid `light:` prefixes with proper pattern (default classes for light mode, `dark:` prefix for dark mode)
+- `client/src/components/ThemeToggle.tsx`: Fixed hover class styling
+- `client/src/pages/HomePage.tsx`: Complete rewrite with proper dark: variants for all elements
+- `client/src/pages/RoomPage.tsx`: Fixed text and button colors for both themes
+- `client/src/components/TopicPanel.tsx`: Complete rewrite with proper dark: variants
+- `client/src/components/VotingHistory.tsx`: Fixed all color classes
+- `client/src/components/CardDeck.tsx`: Fixed container styling
+- `client/src/components/ModeratorControls.tsx`: Fixed all button and text colors
+- `client/src/components/ResultsPanel.tsx`: Complete rewrite with proper dark: variants
+
+### Technical Details:
+Tailwind CSS uses `darkMode: 'class'` strategy where:
+- Default styles (no prefix) apply to light mode
+- `dark:` prefix applies when `.dark` class is on the root element
+- There is NO `light:` prefix in Tailwind - this was the bug
+
+### Summary:
+The theme toggle now correctly switches between light and dark modes. All components have been updated to use the proper Tailwind dark mode pattern where default classes define light mode appearance and `dark:` prefixed classes override for dark mode.
