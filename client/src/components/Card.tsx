@@ -11,8 +11,11 @@ interface CardProps {
   onClick?: () => void;
 }
 
-// Fibonacci values displayed directly as story points
-// No mapping needed - we show the actual Fibonacci numbers
+// Map high Fibonacci values to face cards for visual appeal
+// 13 = K (King) - keeps the playing card aesthetic
+const fibonacciToRank: Record<number, string> = {
+  13: 'K',
+};
 
 // T-Shirt sizes to story points mapping
 const tshirtToSP: Record<string, number> = {
@@ -90,8 +93,9 @@ export default function Card({
     return `${value} Story Points`;
   };
 
-  // For Fibonacci deck - show actual Fibonacci value
-  const rank = String(value);
+  // For Fibonacci deck - map to face card if applicable, otherwise show value
+  const numValue = typeof value === 'number' ? value : parseInt(String(value), 10);
+  const rank = fibonacciToRank[numValue] || String(value);
   const suit = getSuitForValue(String(value));
   const suitColor = suitColors[suit];
 

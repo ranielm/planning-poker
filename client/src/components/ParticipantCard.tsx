@@ -10,6 +10,11 @@ interface ParticipantCardProps {
   deckType?: 'FIBONACCI' | 'TSHIRT';
 }
 
+// Map high Fibonacci values to face cards (same as Card.tsx)
+const fibonacciToRank: Record<string, string> = {
+  '13': 'K',
+};
+
 // T-Shirt sizes to story points mapping
 const tshirtToSP: Record<string, number> = {
   'S': 13,
@@ -139,15 +144,16 @@ export default function ParticipantCard({
                     </span>
                   </div>
                 ) : (
-                  // Fibonacci card - same as deck (number + suit)
+                  // Fibonacci card - same as deck (number/face + suit)
                   (() => {
                     const suit = getSuitForValue(String(vote));
                     const suitColor = suitColors[suit];
+                    const rank = fibonacciToRank[String(vote)] || vote;
                     return (
                       <>
                         {/* Top-left rank and suit */}
                         <div className="absolute top-0.5 left-0.5 flex flex-col items-center leading-none">
-                          <span className={clsx('font-bold text-[8px]', suitColor)}>{vote}</span>
+                          <span className={clsx('font-bold text-[8px]', suitColor)}>{rank}</span>
                           <span className={clsx('text-[7px] -mt-0.5', suitColor)}>{suit}</span>
                         </div>
 
@@ -158,7 +164,7 @@ export default function ParticipantCard({
 
                         {/* Bottom-right rank and suit (rotated) */}
                         <div className="absolute bottom-0.5 right-0.5 flex flex-col items-center leading-none rotate-180">
-                          <span className={clsx('font-bold text-[8px]', suitColor)}>{vote}</span>
+                          <span className={clsx('font-bold text-[8px]', suitColor)}>{rank}</span>
                           <span className={clsx('text-[7px] -mt-0.5', suitColor)}>{suit}</span>
                         </div>
                       </>
