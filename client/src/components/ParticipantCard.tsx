@@ -18,7 +18,21 @@ const tshirtToSP: Record<string, number> = {
   'XL': 104,
 };
 
-// T-Shirt SVG component
+// Suits rotation for visual variety (same as Card.tsx)
+const suits = ['♠', '♥', '♦', '♣'];
+const suitColors: Record<string, string> = {
+  '♠': 'text-slate-900',
+  '♥': 'text-red-600',
+  '♦': 'text-red-600',
+  '♣': 'text-slate-900',
+};
+
+function getSuitForValue(value: string): string {
+  const hash = value.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return suits[hash % 4];
+}
+
+// T-Shirt SVG component (same as Card.tsx)
 function TShirtIcon({ size, className }: { size: string; className?: string }) {
   const scales: Record<string, number> = {
     'S': 0.6,
@@ -38,6 +52,17 @@ function TShirtIcon({ size, className }: { size: string; className?: string }) {
       <path d="M16 21H8a1 1 0 0 1-1-1v-9H3.5a1 1 0 0 1-.7-1.71l4-4a1 1 0 0 1 .7-.29h2a2.5 2.5 0 0 0 5 0h2a1 1 0 0 1 .7.29l4 4a1 1 0 0 1-.7 1.71H17v9a1 1 0 0 1-1 1z"/>
     </svg>
   );
+}
+
+// Get tooltip text for revealed card
+function getTooltipText(vote: string | null, isTShirt: boolean): string {
+  if (vote === '?') return 'Not sure';
+  if (vote === '☕') return 'Need a break';
+  if (isTShirt && vote) {
+    const sp = tshirtToSP[vote];
+    return sp ? `Size ${vote} (${sp} SP)` : `Size ${vote}`;
+  }
+  return vote ? `${vote} Story Points` : '';
 }
 
 export default function ParticipantCard({
@@ -92,7 +117,7 @@ export default function ParticipantCard({
                 <div className="absolute inset-0.5 rounded border border-gray-200" />
 
                 {isJoker ? (
-                  // Joker card
+                  // Joker card - same as deck
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 rounded">
                     <div className="text-lg">🃏</div>
                     <span className="text-[6px] font-bold text-purple-600 tracking-wide">JOKER</span>
@@ -103,8 +128,8 @@ export default function ParticipantCard({
                     <div className="text-lg">☕</div>
                   </div>
                 ) : isTShirt ? (
-                  // T-Shirt card - show shirt icon with size
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  // T-Shirt card - same as deck (shirt icon + size label)
+                  <div className="absolute inset-0 flex flex-col items-center justify-center" title={getTooltipText(vote, true)}>
                     <TShirtIcon
                       size={String(vote)}
                       className="w-6 h-6 text-blue-600"
@@ -112,31 +137,33 @@ export default function ParticipantCard({
                     <span className="text-[8px] font-bold text-slate-600 mt-0.5">
                       {vote}
                     </span>
-                    <span className="text-[6px] text-slate-400">
-                      {tshirtToSP[String(vote)]} SP
-                    </span>
                   </div>
                 ) : (
-                  // Fibonacci card - show number
-                  <>
-                    {/* Top-left corner */}
-                    <span className="absolute top-0.5 left-1 text-[10px] font-bold text-red-600">
-                      {vote}
-                    </span>
+                  // Fibonacci card - same as deck (number + suit)
+                  (() => {
+                    const suit = getSuitForValue(String(vote));
+                    const suitColor = suitColors[suit];
+                    return (
+                      <>
+                        {/* Top-left rank and suit */}
+                        <div className="absolute top-0.5 left-0.5 flex flex-col items-center leading-none">
+                          <span className={clsx('font-bold text-[8px]', suitColor)}>{vote}</span>
+                          <span className={clsx('text-[7px] -mt-0.5', suitColor)}>{suit}</span>
+                        </div>
 
-                    {/* Center value */}
-                    <span className="text-xl font-bold text-slate-800">
-                      {vote}
-                    </span>
+                        {/* Center suit */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className={clsx('text-xl', suitColor)}>{suit}</span>
+                        </div>
 
-                    {/* Bottom-right corner */}
-                    <span className="absolute bottom-0.5 right-1 text-[10px] font-bold rotate-180 text-red-600">
-                      {vote}
-                    </span>
-
-                    {/* Suit decoration */}
-                    <span className="absolute top-0.5 right-1 text-red-600 text-[8px]">♦</span>
-                  </>
+                        {/* Bottom-right rank and suit (rotated) */}
+                        <div className="absolute bottom-0.5 right-0.5 flex flex-col items-center leading-none rotate-180">
+                          <span className={clsx('font-bold text-[8px]', suitColor)}>{vote}</span>
+                          <span className={clsx('text-[7px] -mt-0.5', suitColor)}>{suit}</span>
+                        </div>
+                      </>
+                    );
+                  })()
                 )}
               </>
             ) : (
