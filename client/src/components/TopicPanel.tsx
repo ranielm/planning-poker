@@ -91,12 +91,12 @@ export default function TopicPanel({
             </a>
           )}
 
-          {isModerator && phase === 'REVEALED' && (
+          {isModerator && (
             <button
               onClick={() => setShowForm(true)}
               className="w-full mt-4 px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg transition-colors"
             >
-              Set New Topic
+              {phase === 'REVEALED' ? 'Set New Topic' : 'Change Topic'}
             </button>
           )}
         </div>
