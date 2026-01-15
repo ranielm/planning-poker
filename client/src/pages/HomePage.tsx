@@ -83,8 +83,12 @@ export default function HomePage() {
           onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
-            const slug = formData.get('slug') as string;
-            if (slug) {
+            let input = (formData.get('slug') as string || '').trim();
+            if (input) {
+              // Extract slug from URL if user pasted a full URL
+              // Handles: https://domain.com/poker/slug or /poker/slug or just slug
+              const urlMatch = input.match(/\/poker\/([^/?#]+)/);
+              const slug = urlMatch ? urlMatch[1] : input;
               window.location.href = `/poker/${slug}`;
             }
           }}
