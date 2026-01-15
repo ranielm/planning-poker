@@ -267,3 +267,20 @@ Date: 2026-01-15
 
 ### Summary:
 Fixed modal appearing misaligned by using React Portal. Fixed bug where moderators couldn't add new topics after a round was completed and reset.
+
+## Face Card Mapping for 13 SP
+Date: 2026-01-15
+
+### Overview:
+Mapped 13 Story Points to King (K) on card faces to maintain traditional playing card aesthetic.
+
+### Changes:
+- `client/src/components/Card.tsx`: Added `fibonacciToRank` mapping (13 → 'K'). Cards now display 'K' instead of '13' while tooltip still shows "13 Story Points".
+- `client/src/components/ParticipantCard.tsx`: Same mapping applied for revealed cards on poker table.
+
+### Visual:
+- Card shows: K with suit symbol
+- Tooltip shows: 13 Story Points
+
+### Summary:
+The 13 SP card now displays as King (K) matching traditional playing card conventions while preserving the actual story point value in tooltips.
