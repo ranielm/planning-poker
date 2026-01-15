@@ -145,3 +145,17 @@ Tailwind CSS uses `darkMode: 'class'` strategy where:
 
 ### Summary:
 The theme toggle now correctly switches between light and dark modes. All components have been updated to use the proper Tailwind dark mode pattern where default classes define light mode appearance and `dark:` prefixed classes override for dark mode.
+
+## Voting History Bug Fixes
+Date: 2026-01-15
+
+### Overview:
+Fixed two bugs preventing voting history from working correctly: topics not being saved to rounds, and the history section not being visible.
+
+### Changes:
+- `server/src/modules/game/game.service.ts`: Updated `setTopic()` to save topic to both `room.activeTopic` AND current `round.topic`
+- `client/src/components/VotingHistory.tsx`: Removed conditional return that hid the component when history was empty
+- `client/src/components/TopicPanel.tsx`: Fixed "Set New Topic" button to show form when clicked after reveal
+
+### Summary:
+The voting history now correctly displays previously voted topics with their names and final results. The `setTopic` function was only updating the room's active topic but not the round's topic field, causing history entries to show "Untitled round". Additionally, the VotingHistory component was hidden when empty, preventing users from ever seeing or expanding it. Both issues are now resolved.
