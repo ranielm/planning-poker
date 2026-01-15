@@ -126,6 +126,11 @@ export default function Layout() {
       <main className="flex-1 bg-slate-50 dark:bg-slate-900 transition-colors">
         <Outlet />
       </main>
+
+      {/* Version indicator */}
+      <div className="fixed bottom-2 left-2 text-[10px] text-slate-400 dark:text-slate-600 font-mono">
+        v1.1.0
+      </div>
     </div>
   );
 }
