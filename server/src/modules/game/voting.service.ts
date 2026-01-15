@@ -29,7 +29,7 @@ export interface TShirtResult {
 export type VotingResult = FibonacciResult | TShirtResult;
 
 // Standard Fibonacci sequence for Planning Poker
-const FIBONACCI_SEQUENCE = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
+const FIBONACCI_SEQUENCE = [1, 2, 3, 5, 8, 13];
 
 // T-Shirt sizes and their story point values
 const TSHIRT_SIZES = ['S', 'M', 'L', 'XL'];

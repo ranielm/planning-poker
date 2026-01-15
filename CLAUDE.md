@@ -202,3 +202,22 @@ Simplified the T-Shirt deck to only 4 sizes with specific Story Point values, an
 
 ### Summary:
 The T-Shirt deck is now simpler with just 4 meaningful sizes that double in Story Points (13→26→52→104), making estimation more intuitive for teams that prefer relative sizing.
+
+## Simplified Fibonacci Deck and UI Cleanup
+Date: 2026-01-15
+
+### Overview:
+Simplified the Fibonacci deck to only include commonly used values (1-13) and removed the Create Room button from the header.
+
+### Changes:
+- `client/src/store/gameStore.ts`: Updated FIBONACCI_DECK from [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, '?', '☕'] to [1, 2, 3, 5, 8, 13, '?', '☕']
+- `server/src/modules/game/voting.service.ts`: Updated FIBONACCI_SEQUENCE to [1, 2, 3, 5, 8, 13]
+- `client/src/components/Layout.tsx`: Removed Create Room button from header navigation (both desktop and mobile)
+
+### Fibonacci Deck Values:
+- 1, 2, 3, 5, 8, 13 (standard Fibonacci up to 13)
+- ? (Joker) = Not sure
+- ☕ (Coffee) = Need a break
+
+### Summary:
+The Fibonacci deck now focuses on the most practical range for story point estimation (1-13 SP), removing rarely used high values. The header is cleaner without the redundant Create Room button since users can access room creation from the home page.

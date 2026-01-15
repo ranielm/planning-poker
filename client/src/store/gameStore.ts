@@ -25,7 +25,7 @@ interface GameStore {
   getDeck: () => (string | number)[];
 }
 
-const FIBONACCI_DECK = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, '?', '☕'];
+const FIBONACCI_DECK = [1, 2, 3, 5, 8, 13, '?', '☕'];
 const TSHIRT_DECK = ['S', 'M', 'L', 'XL', '?', '☕'];
 
 // T-Shirt to Story Points mapping
