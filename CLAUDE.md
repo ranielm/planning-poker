@@ -253,3 +253,17 @@ All timestamps use `toLocaleTimeString()` and `toLocaleString()` which automatic
 
 ### Version:
 Updated to v1.1.6
+
+## Bug Fixes - Modal and Topic
+Date: 2026-01-15
+
+### Voting Detail Modal Portal Fix:
+- `client/src/components/VotingHistory.tsx`: Used `createPortal` from react-dom to render the modal directly in `document.body`, escaping the sidebar container context and ensuring proper centering/floating appearance.
+
+### Topic Change at Any Phase:
+- `client/src/components/TopicPanel.tsx`: Removed `phase === 'REVEALED'` restriction from "Set New Topic" button. Moderators can now change the topic at any phase:
+  - In REVEALED phase: button shows "Set New Topic"
+  - In other phases: button shows "Change Topic"
+
+### Summary:
+Fixed modal appearing misaligned by using React Portal. Fixed bug where moderators couldn't add new topics after a round was completed and reset.
