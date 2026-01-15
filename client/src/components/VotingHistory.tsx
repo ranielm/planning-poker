@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronUp, History, Clock, Users, ExternalLink, X, BarChart3, Info } from 'lucide-react';
 import { VotingHistoryItem, VotingResult, FibonacciResult, TShirtResult } from '../types';
 import { useI18n } from '../i18n';
@@ -383,12 +384,13 @@ export default function VotingHistory({ getHistory, onRefresh }: VotingHistoryPr
         )}
       </div>
 
-      {/* Detail Modal */}
-      {selectedItem && (
+      {/* Detail Modal - rendered via portal to escape sidebar context */}
+      {selectedItem && createPortal(
         <VotingDetailModal
           item={selectedItem}
           onClose={() => setSelectedItem(null)}
-        />
+        />,
+        document.body
       )}
     </>
   );
