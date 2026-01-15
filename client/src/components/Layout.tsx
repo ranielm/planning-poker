@@ -129,7 +129,7 @@ export default function Layout() {
 
       {/* Version indicator */}
       <div className="fixed bottom-2 left-2 text-[10px] text-slate-400 dark:text-slate-600 font-mono">
-        v1.1.0
+        v1.1.1
       </div>
     </div>
   );

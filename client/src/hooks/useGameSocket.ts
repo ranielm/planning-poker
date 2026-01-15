@@ -197,8 +197,8 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     : false;
 
   const deck = gameState?.deckType === 'TSHIRT'
-    ? ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕']
-    : [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, '?', '☕'];
+    ? ['S', 'M', 'L', 'XL', '?', '☕']
+    : [1, 2, 3, 5, 8, 13, '?', '☕'];
 
   return {
     // State
