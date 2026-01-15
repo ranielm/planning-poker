@@ -145,6 +145,7 @@ export default function RoomPage() {
                 selectedCard={selectedCard}
                 onSelectCard={castVote}
                 disabled={gameState.phase !== 'VOTING'}
+                deckType={gameState.deckType}
               />
             </div>
           )}

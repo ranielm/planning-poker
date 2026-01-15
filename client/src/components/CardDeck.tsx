@@ -6,6 +6,7 @@ interface CardDeckProps {
   selectedCard: CardValue | null;
   onSelectCard: (value: CardValue) => void;
   disabled?: boolean;
+  deckType?: 'FIBONACCI' | 'TSHIRT';
 }
 
 export default function CardDeck({
@@ -13,6 +14,7 @@ export default function CardDeck({
   selectedCard,
   onSelectCard,
   disabled = false,
+  deckType = 'FIBONACCI',
 }: CardDeckProps) {
   return (
     <div className="bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-700">
@@ -27,6 +29,7 @@ export default function CardDeck({
             isSelected={selectedCard === value}
             onClick={() => onSelectCard(value)}
             isDisabled={disabled}
+            deckType={deckType}
             size="md"
           />
         ))}

@@ -7,10 +7,11 @@ interface CardProps {
   isRevealed?: boolean;
   isDisabled?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  deckType?: 'FIBONACCI' | 'TSHIRT';
   onClick?: () => void;
 }
 
-// Map story point values to playing card ranks
+// Map story point values to playing card ranks (for Fibonacci)
 const valueToRank: Record<string, string> = {
   '0': 'A',
   '1': '2',
@@ -23,13 +24,16 @@ const valueToRank: Record<string, string> = {
   '34': '9',
   '55': '10',
   '89': 'J',
-  '?': 'JOKER',
-  '☕': '☕',
-  // T-Shirt sizes
-  'S': '2',
-  'M': '5',
-  'L': '8',
-  'XL': 'K',
+};
+
+// T-Shirt sizes to story points mapping
+const tshirtToSP: Record<string, number> = {
+  'XS': 1,
+  'S': 2,
+  'M': 5,
+  'L': 8,
+  'XL': 13,
+  'XXL': 21,
 };
 
 // Suits rotation for visual variety
@@ -47,12 +51,38 @@ function getSuitForValue(value: string): string {
   return suits[hash % 4];
 }
 
+// T-Shirt SVG component
+function TShirtIcon({ size, className }: { size: string; className?: string }) {
+  // Scale based on t-shirt size
+  const scales: Record<string, number> = {
+    'XS': 0.5,
+    'S': 0.6,
+    'M': 0.75,
+    'L': 0.85,
+    'XL': 0.95,
+    'XXL': 1.05,
+  };
+  const scale = scales[size] || 0.75;
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      style={{ transform: `scale(${scale})` }}
+    >
+      <path d="M16 21H8a1 1 0 0 1-1-1v-9H3.5a1 1 0 0 1-.7-1.71l4-4a1 1 0 0 1 .7-.29h2a2.5 2.5 0 0 0 5 0h2a1 1 0 0 1 .7.29l4 4a1 1 0 0 1-.7 1.71H17v9a1 1 0 0 1-1 1z"/>
+    </svg>
+  );
+}
+
 export default function Card({
   value,
   isSelected = false,
   isRevealed = true,
   isDisabled = false,
   size = 'md',
+  deckType = 'FIBONACCI',
   onClick,
 }: CardProps) {
   const sizeClasses = {
@@ -61,9 +91,23 @@ export default function Card({
     lg: 'w-16 h-24',
   };
 
+  const isTShirt = deckType === 'TSHIRT' || ['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(String(value));
   const isSpecial = value === '?' || value === '☕';
   const isJoker = value === '?';
   const isCoffee = value === '☕';
+
+  // Generate tooltip text
+  const getTooltipText = () => {
+    if (isJoker) return 'Not sure';
+    if (isCoffee) return 'Need a break';
+    if (isTShirt) {
+      const sp = tshirtToSP[String(value)];
+      return sp ? `Size ${value} (${sp} SP)` : `Size ${value}`;
+    }
+    return `${value} Story Points`;
+  };
+
+  // For Fibonacci deck
   const rank = valueToRank[String(value)] || String(value);
   const suit = getSuitForValue(String(value));
   const suitColor = suitColors[suit];
@@ -72,7 +116,7 @@ export default function Card({
     <button
       onClick={onClick}
       disabled={isDisabled}
-      title={`${value} Story Points`}
+      title={getTooltipText()}
       className={clsx(
         'relative rounded-lg font-bold transition-all duration-200 transform group',
         sizeClasses[size],
@@ -83,7 +127,7 @@ export default function Card({
     >
       {/* Tooltip */}
       <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50 shadow-lg">
-        {value} SP
+        {getTooltipText()}
       </div>
 
       {/* Card shadow */}
@@ -109,33 +153,34 @@ export default function Card({
         />
 
         {isRevealed ? (
-          // Front of card - real playing card style
+          // Front of card
           <>
             {/* Inner border */}
             <div className="absolute inset-[3px] rounded border border-gray-200" />
 
             {isJoker ? (
               // Joker card
-              <>
-                <div className="absolute top-1 left-1.5 text-purple-600 font-bold text-[10px] leading-none">
-                  ?
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-2xl">🃏</div>
-                </div>
-                <div className="absolute bottom-1 right-1.5 text-purple-600 font-bold text-[10px] leading-none rotate-180">
-                  ?
-                </div>
-              </>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-2xl">🃏</div>
+              </div>
             ) : isCoffee ? (
               // Coffee break card
-              <>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-2xl">☕</div>
-                </div>
-              </>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-2xl">☕</div>
+              </div>
+            ) : isTShirt ? (
+              // T-Shirt card - show shirt icon
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <TShirtIcon
+                  size={String(value)}
+                  className="w-10 h-10 text-blue-600"
+                />
+                <span className="text-[10px] font-bold text-slate-600 mt-0.5">
+                  {value}
+                </span>
+              </div>
             ) : (
-              // Regular playing card
+              // Regular playing card (Fibonacci)
               <>
                 {/* Top-left rank and suit */}
                 <div className="absolute top-1 left-1.5 flex flex-col items-center leading-none">
