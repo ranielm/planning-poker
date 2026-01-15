@@ -53,7 +53,6 @@ export default function ParticipantCard({
     OBSERVER: <Eye className="h-3 w-3 text-slate-400" />,
   };
 
-  const isSpecialVote = vote === '?' || vote === '☕';
   const isTShirt = deckType === 'TSHIRT' || ['S', 'M', 'L', 'XL'].includes(String(vote));
   const isJoker = vote === '?';
   const isCoffee = vote === '☕';
