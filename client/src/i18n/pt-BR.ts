@@ -126,6 +126,15 @@ export const ptBR: Translations = {
     loadFromJira: 'Carregar do Jira',
     jiraKey: 'Chave da Issue do Jira',
     jiraKeyPlaceholder: 'ex: PROJ-123',
+    waitingForModerator: 'Aguardando o moderador definir um tópico...',
+  },
+
+  // Voting History
+  history: {
+    title: 'Histórico de Votações',
+    noHistory: 'Nenhum histórico de votações ainda',
+    votes: 'votos',
+    untitledRound: 'Rodada sem título',
   },
 
   // Results Panel

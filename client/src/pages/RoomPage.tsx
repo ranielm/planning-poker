@@ -28,6 +28,7 @@ export default function RoomPage() {
     resetRound,
     setTopic,
     changeDeck,
+    getVotingHistory,
   } = useGameSocket({
     roomSlug: slug || '',
     onKicked: () => navigate('/'),
@@ -122,6 +123,7 @@ export default function RoomPage() {
             onSetTopic={setTopic}
             isModerator={isModerator}
             phase={gameState.phase}
+            getVotingHistory={getVotingHistory}
           />
 
           {gameState.phase === 'REVEALED' && gameState.results && (

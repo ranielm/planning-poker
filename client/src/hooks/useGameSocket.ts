@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { socketService } from '../services/socket';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
-import { GameState, ActiveTopic, DeckType, ParticipantRole, CardValue } from '../types';
+import { GameState, ActiveTopic, DeckType, ParticipantRole, CardValue, VotingHistoryItem } from '../types';
 
 interface UseGameSocketOptions {
   roomSlug: string;
@@ -173,6 +173,19 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     [setError]
   );
 
+  const getVotingHistory = useCallback(
+    async (limit = 10): Promise<VotingHistoryItem[]> => {
+      try {
+        const result = await socketService.getVotingHistory(limit);
+        return result.history;
+      } catch (error: any) {
+        setError(error.message);
+        return [];
+      }
+    },
+    [setError]
+  );
+
   // Computed values
   const isModerator = user ? gameState?.participants.find(p => p.userId === user.id)?.role === 'MODERATOR' : false;
   const canVote = user
@@ -206,5 +219,6 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     changeDeck,
     updateRole,
     kickParticipant,
+    getVotingHistory,
   };
 }

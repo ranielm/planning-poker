@@ -92,3 +92,11 @@ export interface Room {
   isActive: boolean;
   createdAt: string;
 }
+
+export interface VotingHistoryItem {
+  id: string;
+  topic: ActiveTopic | null;
+  finalResult: VotingResult;
+  revealedAt: string;
+  voteCount: number;
+}

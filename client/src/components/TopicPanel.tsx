@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Search, Loader2, AlertCircle } from 'lucide-react';
 import { useJira } from '../hooks/useJira';
-import { ActiveTopic } from '../types';
+import { ActiveTopic, VotingHistoryItem } from '../types';
+import VotingHistory from './VotingHistory';
+import { useI18n } from '../i18n';
 
 interface TopicPanelProps {
   currentTopic: ActiveTopic | null;
   onSetTopic: (topic: ActiveTopic) => void;
   isModerator: boolean;
   phase: string;
+  getVotingHistory: (limit?: number) => Promise<VotingHistoryItem[]>;
 }
 
 export default function TopicPanel({
@@ -15,7 +18,9 @@ export default function TopicPanel({
   onSetTopic,
   isModerator,
   phase,
+  getVotingHistory,
 }: TopicPanelProps) {
+  const { t } = useI18n();
   const [input, setInput] = useState('');
   const [showForm, setShowForm] = useState(false);
   const { isAvailable, isLoading, error, fetchIssue, checkStatus, clearError } = useJira();
@@ -175,9 +180,15 @@ export default function TopicPanel({
         </div>
       ) : (
         <p className="text-slate-400 text-center py-4">
-          Waiting for moderator to set a topic...
+          {t.topic.waitingForModerator}
         </p>
       )}
+
+      {/* Voting History */}
+      <VotingHistory
+        getHistory={getVotingHistory}
+        onRefresh={phase === 'REVEALED'}
+      />
     </div>
   );
 }

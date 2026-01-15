@@ -92,7 +92,6 @@ export default function Card({
   };
 
   const isTShirt = deckType === 'TSHIRT' || ['XS', 'S', 'M', 'L', 'XL', 'XXL'].includes(String(value));
-  const isSpecial = value === '?' || value === '☕';
   const isJoker = value === '?';
   const isCoffee = value === '☕';
 

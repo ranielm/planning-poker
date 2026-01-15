@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client';
-import { GameState, ActiveTopic, DeckType, ParticipantRole } from '../types';
+import { GameState, ActiveTopic, DeckType, ParticipantRole, VotingHistoryItem } from '../types';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || '';
 
@@ -135,6 +135,10 @@ class SocketService {
 
   kickParticipant(targetUserId: string): Promise<{ success: boolean }> {
     return this.emitWithAck('room:kick', { targetUserId });
+  }
+
+  getVotingHistory(limit = 10): Promise<{ success: boolean; history: VotingHistoryItem[] }> {
+    return this.emitWithAck('game:getHistory', { limit });
   }
 
   // Event handling

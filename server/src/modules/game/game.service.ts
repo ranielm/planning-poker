@@ -39,6 +39,14 @@ export interface VoteInfo {
   value: string | null; // Null if not revealed
 }
 
+export interface VotingHistoryItem {
+  id: string;
+  topic: ActiveTopic | null;
+  finalResult: any;
+  revealedAt: Date | null;
+  voteCount: number;
+}
+
 @Injectable()
 export class GameService {
   constructor(
@@ -295,6 +303,43 @@ export class GameService {
     return this.prisma.room.update({
       where: { id: roomId },
       data: { activeTopic: JSON.stringify(topic) },
+    });
+  }
+
+  async getVotingHistory(roomId: string, limit = 10): Promise<VotingHistoryItem[]> {
+    const room = await this.prisma.room.findUnique({
+      where: { id: roomId },
+    });
+
+    if (!room) {
+      throw new NotFoundException('Room not found');
+    }
+
+    // Fetch revealed rounds with votes
+    const rounds = await this.prisma.round.findMany({
+      where: {
+        roomId,
+        phase: GamePhase.REVEALED,
+        revealedAt: { not: null },
+      },
+      orderBy: { revealedAt: 'desc' },
+      take: limit,
+      include: {
+        votes: true,
+      },
+    });
+
+    return rounds.map((round) => {
+      const voteValues = round.votes.map((v) => v.value);
+      const finalResult = this.votingService.calculateResults(room.deckType, voteValues);
+
+      return {
+        id: round.id,
+        topic: round.topic ? JSON.parse(round.topic) : null,
+        finalResult,
+        revealedAt: round.revealedAt,
+        voteCount: round.votes.length,
+      };
     });
   }
 }

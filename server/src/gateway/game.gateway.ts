@@ -410,4 +410,27 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException(error.message || 'Failed to kick participant');
     }
   }
+
+  @SubscribeMessage('game:getHistory')
+  async handleGetHistory(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { limit?: number },
+  ) {
+    const roomId = client.data.roomId;
+
+    if (!roomId) {
+      throw new WsException('Not in a room');
+    }
+
+    try {
+      const history = await this.gameService.getVotingHistory(
+        roomId,
+        data?.limit || 10,
+      );
+
+      return { success: true, history };
+    } catch (error: any) {
+      throw new WsException(error.message || 'Failed to get voting history');
+    }
+  }
 }

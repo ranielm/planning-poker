@@ -124,6 +124,15 @@ export const enUS = {
     loadFromJira: 'Load from Jira',
     jiraKey: 'Jira Issue Key',
     jiraKeyPlaceholder: 'e.g., PROJ-123',
+    waitingForModerator: 'Waiting for moderator to set a topic...',
+  },
+
+  // Voting History
+  history: {
+    title: 'Voting History',
+    noHistory: 'No voting history yet',
+    votes: 'votes',
+    untitledRound: 'Untitled round',
   },
 
   // Results Panel

@@ -92,3 +92,30 @@ Added support for two languages: English (en-US) as default and Portuguese (pt-B
 3. User can change language via dropdown in header or login/register pages
 4. Preference saved in localStorage under 'planning-poker-language'
 5. Date formatting respects current language locale
+
+## Voting History Feature
+Date: 2026-01-15
+
+### Overview:
+Added voting history to track previously voted stories and their results. Users can see past voting rounds with topics, final results, vote counts, and timestamps.
+
+### Server Changes:
+- `server/src/modules/game/game.service.ts`: Added `VotingHistoryItem` interface and `getVotingHistory()` method that fetches revealed rounds with calculated results
+- `server/src/gateway/game.gateway.ts`: Added `game:getHistory` socket event handler
+
+### Client Changes:
+- `client/src/types/index.ts`: Added `VotingHistoryItem` interface
+- `client/src/services/socket.ts`: Added `getVotingHistory()` method
+- `client/src/hooks/useGameSocket.ts`: Exposed `getVotingHistory` callback
+- `client/src/components/VotingHistory.tsx`: New component displaying collapsible history list
+- `client/src/components/TopicPanel.tsx`: Integrated VotingHistory component
+- `client/src/pages/RoomPage.tsx`: Pass `getVotingHistory` to TopicPanel
+- `client/src/i18n/en-US.ts`: Added history translations
+- `client/src/i18n/pt-BR.ts`: Added history translations (Portuguese)
+
+### How it works:
+1. After cards are revealed, the round is stored with its topic and final result
+2. Users can expand the "Voting History" section in the Topic Panel
+3. History shows: topic title (with Jira key if available), final result, vote count, and time
+4. Results are color-coded: green for consensus, yellow for no consensus
+5. Moderators can start a new round by setting a new topic after reveal
