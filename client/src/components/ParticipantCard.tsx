@@ -7,6 +7,37 @@ interface ParticipantCardProps {
   vote: string | null;
   isRevealed: boolean;
   isCurrentUser: boolean;
+  deckType?: 'FIBONACCI' | 'TSHIRT';
+}
+
+// T-Shirt sizes to story points mapping
+const tshirtToSP: Record<string, number> = {
+  'S': 13,
+  'M': 26,
+  'L': 52,
+  'XL': 104,
+};
+
+// T-Shirt SVG component
+function TShirtIcon({ size, className }: { size: string; className?: string }) {
+  const scales: Record<string, number> = {
+    'S': 0.6,
+    'M': 0.7,
+    'L': 0.8,
+    'XL': 0.9,
+  };
+  const scale = scales[size] || 0.7;
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      style={{ transform: `scale(${scale})` }}
+    >
+      <path d="M16 21H8a1 1 0 0 1-1-1v-9H3.5a1 1 0 0 1-.7-1.71l4-4a1 1 0 0 1 .7-.29h2a2.5 2.5 0 0 0 5 0h2a1 1 0 0 1 .7.29l4 4a1 1 0 0 1-.7 1.71H17v9a1 1 0 0 1-1 1z"/>
+    </svg>
+  );
 }
 
 export default function ParticipantCard({
@@ -14,6 +45,7 @@ export default function ParticipantCard({
   vote,
   isRevealed,
   isCurrentUser,
+  deckType = 'FIBONACCI',
 }: ParticipantCardProps) {
   const roleIcons: Record<ParticipantRole, React.ReactNode> = {
     MODERATOR: <Crown className="h-3 w-3 text-yellow-400" />,
@@ -22,6 +54,9 @@ export default function ParticipantCard({
   };
 
   const isSpecialVote = vote === '?' || vote === '☕';
+  const isTShirt = deckType === 'TSHIRT' || ['S', 'M', 'L', 'XL'].includes(String(vote));
+  const isJoker = vote === '?';
+  const isCoffee = vote === '☕';
 
   return (
     <div
@@ -52,38 +87,57 @@ export default function ParticipantCard({
             <Eye className="h-4 w-4 text-slate-500" />
           ) : participant.hasVoted ? (
             isRevealed ? (
-              // Revealed card - casino style
+              // Revealed card
               <>
                 {/* Inner border */}
                 <div className="absolute inset-0.5 rounded border border-gray-200" />
 
-                {/* Top-left corner */}
-                <span className={clsx(
-                  'absolute top-0.5 left-1 text-[10px] font-bold',
-                  isSpecialVote ? 'text-blue-600' : 'text-red-600'
-                )}>
-                  {vote}
-                </span>
+                {isJoker ? (
+                  // Joker card
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 rounded">
+                    <div className="text-lg">🃏</div>
+                    <span className="text-[6px] font-bold text-purple-600 tracking-wide">JOKER</span>
+                  </div>
+                ) : isCoffee ? (
+                  // Coffee break card
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-lg">☕</div>
+                  </div>
+                ) : isTShirt ? (
+                  // T-Shirt card - show shirt icon with size
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <TShirtIcon
+                      size={String(vote)}
+                      className="w-6 h-6 text-blue-600"
+                    />
+                    <span className="text-[8px] font-bold text-slate-600 mt-0.5">
+                      {vote}
+                    </span>
+                    <span className="text-[6px] text-slate-400">
+                      {tshirtToSP[String(vote)]} SP
+                    </span>
+                  </div>
+                ) : (
+                  // Fibonacci card - show number
+                  <>
+                    {/* Top-left corner */}
+                    <span className="absolute top-0.5 left-1 text-[10px] font-bold text-red-600">
+                      {vote}
+                    </span>
 
-                {/* Center value */}
-                <span className={clsx(
-                  'text-xl font-bold',
-                  isSpecialVote ? 'text-blue-600' : 'text-slate-800'
-                )}>
-                  {vote}
-                </span>
+                    {/* Center value */}
+                    <span className="text-xl font-bold text-slate-800">
+                      {vote}
+                    </span>
 
-                {/* Bottom-right corner */}
-                <span className={clsx(
-                  'absolute bottom-0.5 right-1 text-[10px] font-bold rotate-180',
-                  isSpecialVote ? 'text-blue-600' : 'text-red-600'
-                )}>
-                  {vote}
-                </span>
+                    {/* Bottom-right corner */}
+                    <span className="absolute bottom-0.5 right-1 text-[10px] font-bold rotate-180 text-red-600">
+                      {vote}
+                    </span>
 
-                {/* Suit decoration */}
-                {!isSpecialVote && (
-                  <span className="absolute top-0.5 right-1 text-red-600 text-[8px]">♦</span>
+                    {/* Suit decoration */}
+                    <span className="absolute top-0.5 right-1 text-red-600 text-[8px]">♦</span>
+                  </>
                 )}
               </>
             ) : (

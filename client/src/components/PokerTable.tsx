@@ -6,9 +6,10 @@ interface PokerTableProps {
   participants: Participant[];
   votes: VoteInfo[];
   phase: GamePhase;
+  deckType?: 'FIBONACCI' | 'TSHIRT';
 }
 
-export default function PokerTable({ participants, votes, phase }: PokerTableProps) {
+export default function PokerTable({ participants, votes, phase, deckType = 'FIBONACCI' }: PokerTableProps) {
   const { user } = useAuthStore();
   const isRevealed = phase === 'REVEALED';
 
@@ -63,6 +64,7 @@ export default function PokerTable({ participants, votes, phase }: PokerTablePro
                 vote={getVote(participant.userId)}
                 isRevealed={isRevealed}
                 isCurrentUser={participant.userId === user?.id}
+                deckType={deckType}
               />
             ))}
           </div>
@@ -125,6 +127,7 @@ export default function PokerTable({ participants, votes, phase }: PokerTablePro
                 vote={getVote(participant.userId)}
                 isRevealed={isRevealed}
                 isCurrentUser={participant.userId === user?.id}
+                deckType={deckType}
               />
             ))}
           </div>

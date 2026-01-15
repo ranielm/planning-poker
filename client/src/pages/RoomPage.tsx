@@ -137,6 +137,7 @@ export default function RoomPage() {
             participants={gameState.participants}
             votes={gameState.votes}
             phase={gameState.phase}
+            deckType={gameState.deckType}
           />
 
           {/* Card selection */}
