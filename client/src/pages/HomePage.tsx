@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { Room } from '../types';
-import { Plus, Users, Clock, ChevronRight, Loader2, Globe, Lock } from 'lucide-react';
+import { Users, Clock, ChevronRight, Loader2, Globe, Lock, Plus } from 'lucide-react';
 import { useI18n } from '../i18n';
 
 interface PublicRoom {
@@ -67,18 +67,18 @@ export default function HomePage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">{t.home.title}</h1>
-        <p className="text-slate-400 mt-1">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white dark:text-white">{t.home.title}</h1>
+        <p className="text-slate-400 dark:text-slate-400 mt-1 text-sm sm:text-base">
           {t.home.subtitle}
         </p>
       </div>
 
       {/* Quick join */}
-      <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-8">
-        <h2 className="text-lg font-semibold text-white mb-3">{t.home.joinRoom}</h2>
+      <div className="bg-slate-800 dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-700 dark:border-slate-700 mb-6 sm:mb-8">
+        <h2 className="text-base sm:text-lg font-semibold text-white dark:text-white mb-3">{t.home.joinRoom}</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -88,133 +88,145 @@ export default function HomePage() {
               window.location.href = `/poker/${slug}`;
             }
           }}
-          className="flex gap-3"
+          className="flex flex-col sm:flex-row gap-3"
         >
           <input
             name="slug"
             type="text"
             placeholder={t.home.enterRoomCode}
-            className="flex-1 px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="flex-1 px-4 py-2.5 sm:py-2 bg-slate-700 dark:bg-slate-700 border border-slate-600 dark:border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
           <button
             type="submit"
-            className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+            className="px-6 py-2.5 sm:py-2 bg-slate-700 dark:bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
           >
             {t.common.join}
           </button>
         </form>
       </div>
 
-      {/* Your Rooms list */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-4">
-          <Lock className="h-5 w-5 text-slate-400" />
-          <h2 className="text-xl font-semibold text-white">{t.home.yourRooms}</h2>
-        </div>
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
-          </div>
-        ) : rooms.length > 0 ? (
-          <div className="space-y-3">
-            {rooms.map((room) => (
-              <Link
-                key={room.id}
-                to={`/poker/${room.slug}`}
-                className="block bg-slate-800 rounded-xl p-4 border border-slate-700 hover:border-primary-500 transition-colors group"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-medium text-white group-hover:text-primary-400 transition-colors">
-                      {room.name}
-                    </h3>
-                    <div className="flex items-center gap-4 mt-1 text-sm text-slate-400">
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {formatDate(room.createdAt)}
-                      </span>
-                      <span className="px-2 py-0.5 bg-slate-700 rounded text-xs">
-                        {room.deckType}
-                      </span>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-slate-500 group-hover:text-primary-400 transition-colors" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 bg-slate-800/50 rounded-xl border border-slate-700">
-            <Users className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-slate-300">{t.home.noRoomsYet}</h3>
-            <p className="text-slate-500 mt-1">
-              {t.home.noRoomsDescription}
-            </p>
+      {/* Grid layout for desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+        {/* Your Rooms list */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-slate-400" />
+              <h2 className="text-lg sm:text-xl font-semibold text-white dark:text-white">{t.home.yourRooms}</h2>
+            </div>
             <Link
               to="/create"
-              className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg transition-colors"
             >
-              <Plus className="h-5 w-5" />
-              {t.home.createRoom}
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">{t.home.createRoom}</span>
             </Link>
           </div>
-        )}
-      </div>
-
-      {/* Public Rooms list */}
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <Globe className="h-5 w-5 text-green-400" />
-          <h2 className="text-xl font-semibold text-white">{t.home.publicRooms}</h2>
-        </div>
-        {isLoadingPublic ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
-          </div>
-        ) : publicRooms.length > 0 ? (
-          <div className="space-y-3">
-            {publicRooms.map((room) => (
-              <Link
-                key={room.id}
-                to={`/poker/${room.slug}`}
-                className="block bg-slate-800 rounded-xl p-4 border border-slate-700 hover:border-green-500 transition-colors group"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-medium text-white group-hover:text-green-400 transition-colors">
-                      {room.name}
-                    </h3>
-                    <div className="flex items-center gap-4 mt-1 text-sm text-slate-400">
-                      <span className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        {room._count.participants} {t.home.participants}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {formatDate(room.createdAt)}
-                      </span>
-                      <span className="px-2 py-0.5 bg-slate-700 rounded text-xs">
-                        {room.deckType}
-                      </span>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+            </div>
+          ) : rooms.length > 0 ? (
+            <div className="space-y-3">
+              {rooms.map((room) => (
+                <Link
+                  key={room.id}
+                  to={`/poker/${room.slug}`}
+                  className="block bg-slate-800 dark:bg-slate-800 rounded-xl p-4 border border-slate-700 dark:border-slate-700 hover:border-primary-500 transition-colors group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-base sm:text-lg font-medium text-white dark:text-white group-hover:text-primary-400 transition-colors truncate">
+                        {room.name}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 text-xs sm:text-sm text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          {formatDate(room.createdAt)}
+                        </span>
+                        <span className="px-2 py-0.5 bg-slate-700 dark:bg-slate-700 rounded text-xs">
+                          {room.deckType}
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {t.home.by} {room.moderator.displayName}
-                    </p>
+                    <ChevronRight className="h-5 w-5 text-slate-500 group-hover:text-primary-400 transition-colors flex-shrink-0 ml-2" />
                   </div>
-                  <ChevronRight className="h-5 w-5 text-slate-500 group-hover:text-green-400 transition-colors" />
-                </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-slate-800/50 dark:bg-slate-800/50 rounded-xl border border-slate-700 dark:border-slate-700">
+              <Users className="h-10 w-10 text-slate-600 mx-auto mb-3" />
+              <h3 className="text-base sm:text-lg font-medium text-slate-300">{t.home.noRoomsYet}</h3>
+              <p className="text-slate-500 mt-1 text-sm">
+                {t.home.noRoomsDescription}
+              </p>
+              <Link
+                to="/create"
+                className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors text-sm"
+              >
+                <Plus className="h-4 w-4" />
+                {t.home.createRoom}
               </Link>
-            ))}
+            </div>
+          )}
+        </div>
+
+        {/* Public Rooms list */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Globe className="h-5 w-5 text-green-400" />
+            <h2 className="text-lg sm:text-xl font-semibold text-white dark:text-white">{t.home.publicRooms}</h2>
           </div>
-        ) : (
-          <div className="text-center py-8 bg-slate-800/50 rounded-xl border border-slate-700">
-            <Globe className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-slate-300">{t.home.noPublicRooms}</h3>
-            <p className="text-slate-500 mt-1">
-              {t.home.noPublicRoomsDescription}
-            </p>
-          </div>
-        )}
+          {isLoadingPublic ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+            </div>
+          ) : publicRooms.length > 0 ? (
+            <div className="space-y-3">
+              {publicRooms.map((room) => (
+                <Link
+                  key={room.id}
+                  to={`/poker/${room.slug}`}
+                  className="block bg-slate-800 dark:bg-slate-800 rounded-xl p-4 border border-slate-700 dark:border-slate-700 hover:border-green-500 transition-colors group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-base sm:text-lg font-medium text-white dark:text-white group-hover:text-green-400 transition-colors truncate">
+                        {room.name}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 text-xs sm:text-sm text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          {room._count.participants} {t.home.participants}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          {formatDate(room.createdAt)}
+                        </span>
+                        <span className="px-2 py-0.5 bg-slate-700 dark:bg-slate-700 rounded text-xs">
+                          {room.deckType}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {t.home.by} {room.moderator.displayName}
+                      </p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-slate-500 group-hover:text-green-400 transition-colors flex-shrink-0 ml-2" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-slate-800/50 dark:bg-slate-800/50 rounded-xl border border-slate-700 dark:border-slate-700">
+              <Globe className="h-10 w-10 text-slate-600 mx-auto mb-3" />
+              <h3 className="text-base sm:text-lg font-medium text-slate-300">{t.home.noPublicRooms}</h3>
+              <p className="text-slate-500 mt-1 text-sm">
+                {t.home.noPublicRoomsDescription}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
