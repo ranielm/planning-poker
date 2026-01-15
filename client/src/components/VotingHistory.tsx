@@ -56,10 +56,6 @@ export default function VotingHistory({ getHistory, onRefresh }: VotingHistoryPr
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  if (history.length === 0 && !isExpanded) {
-    return null;
-  }
-
   return (
     <div className="mt-4 border-t border-slate-200 dark:border-slate-700 pt-4">
       <button

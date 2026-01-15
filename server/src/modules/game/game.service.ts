@@ -290,6 +290,13 @@ export class GameService {
   async setTopic(roomId: string, moderatorId: string, topic: ActiveTopic) {
     const room = await this.prisma.room.findUnique({
       where: { id: roomId },
+      include: {
+        rounds: {
+          where: { phase: { not: GamePhase.REVEALED } },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
     });
 
     if (!room) {
@@ -300,10 +307,22 @@ export class GameService {
       throw new ForbiddenException('Only the moderator can set the topic');
     }
 
-    return this.prisma.room.update({
+    // Update room's active topic
+    await this.prisma.room.update({
       where: { id: roomId },
       data: { activeTopic: JSON.stringify(topic) },
     });
+
+    // Also update the current round's topic if there's an active round
+    const currentRound = room.rounds[0];
+    if (currentRound) {
+      await this.prisma.round.update({
+        where: { id: currentRound.id },
+        data: { topic: JSON.stringify(topic) },
+      });
+    }
+
+    return room;
   }
 
   async getVotingHistory(roomId: string, limit = 10): Promise<VotingHistoryItem[]> {
