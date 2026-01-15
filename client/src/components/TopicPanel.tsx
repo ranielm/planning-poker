@@ -61,22 +61,22 @@ export default function TopicPanel({
   };
 
   return (
-    <div className="bg-slate-800/80 backdrop-blur rounded-xl p-6 border border-slate-700">
-      <h3 className="text-lg font-semibold text-white mb-4">Current Topic</h3>
+    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Current Topic</h3>
 
       {currentTopic ? (
         <div className="space-y-3">
           <div className="flex items-start gap-3">
             {currentTopic.jiraKey && (
-              <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-sm rounded font-mono">
+              <span className="px-2 py-1 bg-blue-500/20 text-blue-600 dark:text-blue-400 text-sm rounded font-mono">
                 {currentTopic.jiraKey}
               </span>
             )}
-            <h4 className="text-white font-medium flex-1">{currentTopic.title}</h4>
+            <h4 className="text-slate-900 dark:text-white font-medium flex-1">{currentTopic.title}</h4>
           </div>
 
           {currentTopic.description && (
-            <p className="text-slate-400 text-sm line-clamp-3">{currentTopic.description}</p>
+            <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3">{currentTopic.description}</p>
           )}
 
           {currentTopic.jiraUrl && (
@@ -84,7 +84,7 @@ export default function TopicPanel({
               href={currentTopic.jiraUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-primary-400 text-sm hover:underline"
+              className="inline-flex items-center gap-1 text-primary-600 dark:text-primary-400 text-sm hover:underline"
             >
               View in Jira
               <ExternalLink className="h-3 w-3" />
@@ -94,7 +94,7 @@ export default function TopicPanel({
           {isModerator && phase === 'REVEALED' && (
             <button
               onClick={() => setShowForm(true)}
-              className="w-full mt-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+              className="w-full mt-4 px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg transition-colors"
             >
               Set New Topic
             </button>
@@ -105,14 +105,14 @@ export default function TopicPanel({
           {!showForm ? (
             <button
               onClick={() => setShowForm(true)}
-              className="w-full px-4 py-3 border-2 border-dashed border-slate-600 rounded-lg text-slate-400 hover:border-primary-500 hover:text-primary-400 transition-colors"
+              className="w-full px-4 py-3 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-slate-500 dark:text-slate-400 hover:border-primary-500 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
             >
               + Add Topic to Estimate
             </button>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm text-slate-400 mb-2">
+                <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2">
                   {isAvailable
                     ? 'Enter Jira issue key, URL, or custom topic'
                     : 'Enter topic to estimate'}
@@ -123,17 +123,17 @@ export default function TopicPanel({
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={isAvailable ? 'PROJ-123 or topic name...' : 'Topic name...'}
-                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-2 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     autoFocus
                   />
                   {isLoading && (
-                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-400 animate-spin" />
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-500 dark:text-primary-400 animate-spin" />
                   )}
                 </div>
               </div>
 
               {error && (
-                <div className="flex items-center gap-2 text-red-400 text-sm">
+                <div className="flex items-center gap-2 text-red-500 dark:text-red-400 text-sm">
                   <AlertCircle className="h-4 w-4" />
                   <span>{error}</span>
                 </div>
@@ -149,7 +149,7 @@ export default function TopicPanel({
                 <button
                   type="submit"
                   disabled={isLoading || !input.trim()}
-                  className="flex-1 px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
                     <>
@@ -170,7 +170,7 @@ export default function TopicPanel({
                     setInput('');
                     clearError();
                   }}
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                  className="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
@@ -179,7 +179,7 @@ export default function TopicPanel({
           )}
         </div>
       ) : (
-        <p className="text-slate-400 text-center py-4">
+        <p className="text-slate-600 dark:text-slate-400 text-center py-4">
           {t.topic.waitingForModerator}
         </p>
       )}

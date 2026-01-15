@@ -61,16 +61,16 @@ export default function VotingHistory({ getHistory, onRefresh }: VotingHistoryPr
   }
 
   return (
-    <div className="mt-4 border-t border-slate-700 pt-4">
+    <div className="mt-4 border-t border-slate-200 dark:border-slate-700 pt-4">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center justify-between w-full text-left text-slate-400 hover:text-white transition-colors"
+        className="flex items-center justify-between w-full text-left text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
       >
         <div className="flex items-center gap-2">
           <History className="h-4 w-4" />
           <span className="text-sm font-medium">{t.history.title}</span>
           {history.length > 0 && (
-            <span className="px-1.5 py-0.5 bg-slate-700 rounded text-xs">
+            <span className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs">
               {history.length}
             </span>
           )}
@@ -96,23 +96,23 @@ export default function VotingHistory({ getHistory, onRefresh }: VotingHistoryPr
             history.map((item) => (
               <div
                 key={item.id}
-                className="bg-slate-700/50 rounded-lg p-3 text-sm"
+                className="bg-slate-100 dark:bg-slate-700/50 rounded-lg p-3 text-sm"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     {item.topic ? (
                       <div className="flex items-center gap-2">
                         {item.topic.jiraKey && (
-                          <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded font-mono">
+                          <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs rounded font-mono">
                             {item.topic.jiraKey}
                           </span>
                         )}
-                        <span className="text-white truncate">
+                        <span className="text-slate-900 dark:text-white truncate">
                           {item.topic.title}
                         </span>
                       </div>
                     ) : (
-                      <span className="text-slate-400 italic">
+                      <span className="text-slate-500 dark:text-slate-400 italic">
                         {t.history.untitledRound}
                       </span>
                     )}
@@ -121,8 +121,8 @@ export default function VotingHistory({ getHistory, onRefresh }: VotingHistoryPr
                     <span
                       className={`px-2 py-1 rounded font-bold text-xs ${
                         item.finalResult.isConsensus
-                          ? 'bg-green-500/20 text-green-400'
-                          : 'bg-yellow-500/20 text-yellow-400'
+                          ? 'bg-green-500/20 text-green-600 dark:text-green-400'
+                          : 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400'
                       }`}
                     >
                       {getResultDisplay(item.finalResult)}

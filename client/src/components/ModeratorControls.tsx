@@ -26,9 +26,9 @@ export default function ModeratorControls({
   const allVoted = votersReady === totalVoters && totalVoters > 0;
 
   return (
-    <div className="bg-slate-800/80 backdrop-blur rounded-xl p-6 border border-slate-700">
-      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-        <Settings className="h-5 w-5 text-slate-400" />
+    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+        <Settings className="h-5 w-5 text-slate-500 dark:text-slate-400" />
         Moderator Controls
       </h3>
 
@@ -43,7 +43,7 @@ export default function ModeratorControls({
               ? allVoted
                 ? 'bg-poker-gold text-slate-900 hover:bg-yellow-500 animate-pulse-soft'
                 : 'bg-primary-600 hover:bg-primary-700 text-white'
-              : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+              : 'bg-slate-200 dark:bg-slate-700 text-slate-500 cursor-not-allowed'
           )}
         >
           <Eye className="h-5 w-5" />
@@ -61,8 +61,8 @@ export default function ModeratorControls({
           className={clsx(
             'w-full px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2',
             canReset
-              ? 'bg-slate-700 hover:bg-slate-600 text-white'
-              : 'bg-slate-700/50 text-slate-600 cursor-not-allowed'
+              ? 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white'
+              : 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 dark:text-slate-600 cursor-not-allowed'
           )}
         >
           <RotateCcw className="h-5 w-5" />
@@ -72,7 +72,7 @@ export default function ModeratorControls({
 
       {/* Deck selector */}
       <div>
-        <p className="text-sm text-slate-400 mb-2">Deck Type</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Deck Type</p>
         <div className="flex gap-2">
           <button
             onClick={() => onChangeDeck('FIBONACCI')}
@@ -80,7 +80,7 @@ export default function ModeratorControls({
               'flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
               deckType === 'FIBONACCI'
                 ? 'bg-primary-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
             )}
           >
             Fibonacci
@@ -91,7 +91,7 @@ export default function ModeratorControls({
               'flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
               deckType === 'TSHIRT'
                 ? 'bg-primary-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
             )}
           >
             T-Shirt

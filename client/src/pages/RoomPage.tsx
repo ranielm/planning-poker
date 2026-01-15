@@ -46,7 +46,7 @@ export default function RoomPage() {
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 text-primary-500 animate-spin mx-auto mb-4" />
-          <p className="text-slate-400">
+          <p className="text-slate-600 dark:text-slate-400">
             {isJoining ? 'Joining room...' : 'Connecting...'}
           </p>
         </div>
@@ -60,10 +60,10 @@ export default function RoomPage() {
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
             Failed to join room
           </h2>
-          <p className="text-slate-400 mb-4">{error}</p>
+          <p className="text-slate-600 dark:text-slate-400 mb-4">{error}</p>
           <Link
             to="/"
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors"
@@ -89,19 +89,19 @@ export default function RoomPage() {
       <div className="max-w-7xl mx-auto mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">{gameState.roomName}</h1>
-            <p className="text-slate-400 text-sm">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{gameState.roomName}</h1>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
               {gameState.participants.length} participant
               {gameState.participants.length !== 1 ? 's' : ''} in room
             </p>
           </div>
           <button
             onClick={copyRoomLink}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg transition-colors"
           >
             {copied ? (
               <>
-                <Check className="h-4 w-4 text-green-400" />
+                <Check className="h-4 w-4 text-green-500 dark:text-green-400" />
                 Copied!
               </>
             ) : (

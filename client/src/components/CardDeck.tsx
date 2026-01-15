@@ -17,8 +17,8 @@ export default function CardDeck({
   deckType = 'FIBONACCI',
 }: CardDeckProps) {
   return (
-    <div className="bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-700">
-      <h3 className="text-sm font-medium text-slate-400 mb-4 text-center">
+    <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+      <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 text-center">
         Select your estimate
       </h3>
       <div className="flex flex-wrap justify-center gap-3">
