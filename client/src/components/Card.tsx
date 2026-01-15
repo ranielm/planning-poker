@@ -11,20 +11,8 @@ interface CardProps {
   onClick?: () => void;
 }
 
-// Map story point values to playing card ranks (for Fibonacci)
-const valueToRank: Record<string, string> = {
-  '0': 'A',
-  '1': '2',
-  '2': '3',
-  '3': '4',
-  '5': '5',
-  '8': '6',
-  '13': '7',
-  '21': '8',
-  '34': '9',
-  '55': '10',
-  '89': 'J',
-};
+// Fibonacci values displayed directly as story points
+// No mapping needed - we show the actual Fibonacci numbers
 
 // T-Shirt sizes to story points mapping
 const tshirtToSP: Record<string, number> = {
@@ -106,8 +94,8 @@ export default function Card({
     return `${value} Story Points`;
   };
 
-  // For Fibonacci deck
-  const rank = valueToRank[String(value)] || String(value);
+  // For Fibonacci deck - show actual Fibonacci value
+  const rank = String(value);
   const suit = getSuitForValue(String(value));
   const suitColor = suitColors[suit];
 

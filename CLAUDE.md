@@ -159,3 +159,21 @@ Fixed two bugs preventing voting history from working correctly: topics not bein
 
 ### Summary:
 The voting history now correctly displays previously voted topics with their names and final results. The `setTopic` function was only updating the room's active topic but not the round's topic field, causing history entries to show "Untitled round". Additionally, the VotingHistory component was hidden when empty, preventing users from ever seeing or expanding it. Both issues are now resolved.
+
+## Fibonacci Card Display Fix
+Date: 2026-01-15
+
+### Overview:
+Fixed the Fibonacci deck cards to display actual Fibonacci sequence values (0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89) instead of sequential playing card ranks (A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J).
+
+### Changes:
+- `client/src/components/Card.tsx`: Removed `valueToRank` mapping that was converting Fibonacci values to traditional playing card ranks. Cards now display the actual Story Point values directly.
+
+### Technical Details:
+The previous implementation had a mapping that converted Fibonacci values to playing card ranks:
+- 0 → "A", 1 → "2", 2 → "3", 3 → "4", 5 → "5", 8 → "6", etc.
+
+This was confusing because users selecting card "6" were actually voting "8 SP". Now cards display the true Fibonacci values making the Planning Poker experience intuitive and correct.
+
+### Summary:
+Cards now show actual Fibonacci Story Point values (0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ?, ☕) matching standard Planning Poker conventions.
