@@ -128,7 +128,7 @@ export default function Layout() {
       </main>
 
       {/* Version indicator */}
-      <div className="fixed bottom-2 left-2 text-[10px] text-slate-400 dark:text-slate-600 font-mono">
+      <div className="fixed bottom-3 left-3 text-xs text-slate-400 dark:text-slate-500 font-mono">
         v1.1.2
       </div>
     </div>
