@@ -131,7 +131,7 @@ export default function Layout() {
 
       {/* Version indicator */}
       <div className="fixed bottom-3 left-3 text-xs text-slate-400 dark:text-slate-500 font-mono">
-        v1.1.5
+        v1.1.6
       </div>
     </div>
   );

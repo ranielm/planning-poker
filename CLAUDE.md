@@ -221,3 +221,35 @@ Simplified the Fibonacci deck to only include commonly used values (1-13) and re
 
 ### Summary:
 The Fibonacci deck now focuses on the most practical range for story point estimation (1-13 SP), removing rarely used high values. The header is cleaner without the redundant Create Room button since users can access room creation from the home page.
+
+## Voting History Detail Modal and Session Timer
+Date: 2026-01-15
+
+### Overview:
+Added a detail modal for voting history items and a session timer to track how long users have been in a room.
+
+### Voting History Detail Modal:
+- `client/src/components/VotingHistory.tsx`: Added `VotingDetailModal` component with:
+  - Topic info section (Jira key badge, title, description)
+  - "Open in Jira" button when jiraUrl is available
+  - Final result with consensus/no consensus indicator
+  - Distribution bar chart showing vote breakdown
+  - Stats cards (total votes, revealed timestamp)
+  - Skipped votes count
+  - Average/Rounded values for Fibonacci results
+  - Close on ESC key or backdrop click
+- History items converted from div to button for clickability
+- Added "Click for details" hint on each item
+
+### Session Timer:
+- `client/src/components/SessionTimer.tsx`: New component that tracks time since user joined the room
+  - Shows elapsed time in mm:ss or h:mm:ss format
+  - Uses monospace font with tabular-nums for stable display
+  - Updates every second
+- `client/src/pages/RoomPage.tsx`: Added SessionTimer to room header alongside participant count
+
+### Timezone Handling:
+All timestamps use `toLocaleTimeString()` and `toLocaleString()` which automatically use the user's browser timezone.
+
+### Version:
+Updated to v1.1.6

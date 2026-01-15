@@ -8,6 +8,7 @@ import ResultsPanel from '../components/ResultsPanel';
 import ModeratorControls from '../components/ModeratorControls';
 import { Loader2, AlertCircle, Copy, Check, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
+import SessionTimer from '../components/SessionTimer';
 
 export default function RoomPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -90,10 +91,14 @@ export default function RoomPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{gameState.roomName}</h1>
-            <p className="text-slate-600 dark:text-slate-400 text-sm">
-              {gameState.participants.length} participant
-              {gameState.participants.length !== 1 ? 's' : ''} in room
-            </p>
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-slate-600 dark:text-slate-400">
+                {gameState.participants.length} participant
+                {gameState.participants.length !== 1 ? 's' : ''}
+              </span>
+              <span className="text-slate-300 dark:text-slate-600">•</span>
+              <SessionTimer />
+            </div>
           </div>
           <button
             onClick={copyRoomLink}
