@@ -1,6 +1,6 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { LogOut, User, Plus, Home, Menu, X } from 'lucide-react';
+import { LogOut, User, Home, Menu, X } from 'lucide-react';
 import { LanguageSelector } from './LanguageSelector';
 import ThemeToggle from './ThemeToggle';
 import { useI18n } from '../i18n';
@@ -37,13 +37,6 @@ export default function Layout() {
               >
                 <Home className="h-4 w-4" />
                 <span>{t.nav.home}</span>
-              </Link>
-              <Link
-                to="/create"
-                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                <span>{t.home.createRoom}</span>
               </Link>
             </nav>
 
@@ -99,14 +92,6 @@ export default function Layout() {
               >
                 <Home className="h-4 w-4" />
                 <span>{t.nav.home}</span>
-              </Link>
-              <Link
-                to="/create"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium bg-primary-600 text-white"
-              >
-                <Plus className="h-4 w-4" />
-                <span>{t.home.createRoom}</span>
               </Link>
               <div className="border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
                 <Link
