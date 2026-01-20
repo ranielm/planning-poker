@@ -11,11 +11,7 @@ interface CardProps {
   onClick?: () => void;
 }
 
-// Map high Fibonacci values to face cards for visual appeal
-// 13 = K (King) - keeps the playing card aesthetic
-const fibonacciToRank: Record<number, string> = {
-  13: 'K',
-};
+// No face card mapping - show actual numbers
 
 // T-Shirt sizes to story points mapping
 const tshirtToSP: Record<string, number> = {
@@ -25,43 +21,6 @@ const tshirtToSP: Record<string, number> = {
   'XL': 104,
 };
 
-// Suits rotation for visual variety
-const suits = ['♠', '♥', '♦', '♣'];
-const suitColors: Record<string, string> = {
-  '♠': 'text-slate-900',
-  '♥': 'text-red-600',
-  '♦': 'text-red-600',
-  '♣': 'text-slate-900',
-};
-
-// Get consistent suit based on value
-function getSuitForValue(value: string): string {
-  const hash = value.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return suits[hash % 4];
-}
-
-// T-Shirt SVG component
-function TShirtIcon({ size, className }: { size: string; className?: string }) {
-  // Scale based on t-shirt size
-  const scales: Record<string, number> = {
-    'S': 0.65,
-    'M': 0.75,
-    'L': 0.85,
-    'XL': 1.0,
-  };
-  const scale = scales[size] || 0.75;
-
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className}
-      style={{ transform: `scale(${scale})` }}
-    >
-      <path d="M16 21H8a1 1 0 0 1-1-1v-9H3.5a1 1 0 0 1-.7-1.71l4-4a1 1 0 0 1 .7-.29h2a2.5 2.5 0 0 0 5 0h2a1 1 0 0 1 .7.29l4 4a1 1 0 0 1-.7 1.71H17v9a1 1 0 0 1-1 1z"/>
-    </svg>
-  );
-}
 
 export default function Card({
   value,
@@ -93,11 +52,7 @@ export default function Card({
     return `${value} Story Points`;
   };
 
-  // For Fibonacci deck - map to face card if applicable, otherwise show value
-  const numValue = typeof value === 'number' ? value : parseInt(String(value), 10);
-  const rank = fibonacciToRank[numValue] || String(value);
-  const suit = getSuitForValue(String(value));
-  const suitColor = suitColors[suit];
+
 
   return (
     <button
@@ -157,36 +112,19 @@ export default function Card({
                 <div className="text-2xl">☕</div>
               </div>
             ) : isTShirt ? (
-              // T-Shirt card - show shirt icon
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <TShirtIcon
-                  size={String(value)}
-                  className="w-10 h-10 text-blue-600"
-                />
-                <span className="text-[10px] font-bold text-slate-600 mt-0.5">
+              // T-Shirt card - show only the size letter large and centered
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-5xl font-bold text-slate-700">
                   {value}
                 </span>
               </div>
             ) : (
-              // Regular playing card (Fibonacci)
-              <>
-                {/* Top-left rank and suit */}
-                <div className="absolute top-1 left-1.5 flex flex-col items-center leading-none">
-                  <span className={clsx('font-bold text-[11px]', suitColor)}>{rank}</span>
-                  <span className={clsx('text-[10px] -mt-0.5', suitColor)}>{suit}</span>
-                </div>
-
-                {/* Center suit pattern */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className={clsx('text-3xl', suitColor)}>{suit}</span>
-                </div>
-
-                {/* Bottom-right rank and suit (rotated) */}
-                <div className="absolute bottom-1 right-1.5 flex flex-col items-center leading-none rotate-180">
-                  <span className={clsx('font-bold text-[11px]', suitColor)}>{rank}</span>
-                  <span className={clsx('text-[10px] -mt-0.5', suitColor)}>{suit}</span>
-                </div>
-              </>
+              // Regular card (Fibonacci) - show only the number large and centered
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-6xl font-bold text-slate-700">
+                  {value}
+                </span>
+              </div>
             )}
           </>
         ) : (

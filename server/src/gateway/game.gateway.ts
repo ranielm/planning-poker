@@ -52,7 +52,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly roomService: RoomService,
     private readonly votingService: VotingService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async handleConnection(client: AuthenticatedSocket) {
     try {
@@ -408,6 +408,35 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return { success: true };
     } catch (error: any) {
       throw new WsException(error.message || 'Failed to kick participant');
+    }
+  }
+
+  @SubscribeMessage('game:setBrb')
+  async handleSetBrb(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { isBrb: boolean },
+  ) {
+    const roomId = client.data.roomId;
+    const userId = client.data.user.sub;
+
+    if (!roomId) {
+      throw new WsException('Not in a room');
+    }
+
+    try {
+      await this.gameService.setBrbStatus(roomId, userId, data.isBrb);
+
+      // Broadcast BRB status change
+      const gameState = await this.gameService.getGameState(roomId);
+      this.server.to(roomId).emit('game:brbStatusChanged', {
+        userId,
+        isBrb: data.isBrb,
+      });
+      this.server.to(roomId).emit('room:state', gameState);
+
+      return { success: true };
+    } catch (error: any) {
+      throw new WsException(error.message || 'Failed to set BRB status');
     }
   }
 

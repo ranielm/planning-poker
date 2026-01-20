@@ -10,10 +10,7 @@ interface ParticipantCardProps {
   deckType?: 'FIBONACCI' | 'TSHIRT';
 }
 
-// Map high Fibonacci values to face cards (same as Card.tsx)
-const fibonacciToRank: Record<string, string> = {
-  '13': 'K',
-};
+// No face card mapping - show actual numbers
 
 // T-Shirt sizes to story points mapping
 const tshirtToSP: Record<string, number> = {
@@ -23,41 +20,7 @@ const tshirtToSP: Record<string, number> = {
   'XL': 104,
 };
 
-// Suits rotation for visual variety (same as Card.tsx)
-const suits = ['♠', '♥', '♦', '♣'];
-const suitColors: Record<string, string> = {
-  '♠': 'text-slate-900',
-  '♥': 'text-red-600',
-  '♦': 'text-red-600',
-  '♣': 'text-slate-900',
-};
 
-function getSuitForValue(value: string): string {
-  const hash = value.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return suits[hash % 4];
-}
-
-// T-Shirt SVG component (same as Card.tsx)
-function TShirtIcon({ size, className }: { size: string; className?: string }) {
-  const scales: Record<string, number> = {
-    'S': 0.6,
-    'M': 0.7,
-    'L': 0.8,
-    'XL': 0.9,
-  };
-  const scale = scales[size] || 0.7;
-
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className}
-      style={{ transform: `scale(${scale})` }}
-    >
-      <path d="M16 21H8a1 1 0 0 1-1-1v-9H3.5a1 1 0 0 1-.7-1.71l4-4a1 1 0 0 1 .7-.29h2a2.5 2.5 0 0 0 5 0h2a1 1 0 0 1 .7.29l4 4a1 1 0 0 1-.7 1.71H17v9a1 1 0 0 1-1 1z"/>
-    </svg>
-  );
-}
 
 // Get tooltip text for revealed card
 function getTooltipText(vote: string | null, isTShirt: boolean): string {
@@ -106,10 +69,10 @@ export default function ParticipantCard({
             participant.role === 'OBSERVER'
               ? 'bg-slate-700/80 border border-dashed border-slate-500'
               : participant.hasVoted
-              ? isRevealed
-                ? 'bg-gradient-to-br from-white via-gray-50 to-gray-100 border border-gray-300'
-                : 'bg-gradient-to-br from-red-700 via-red-800 to-red-900 border border-red-600'
-              : 'bg-slate-700/80 border border-slate-600'
+                ? isRevealed
+                  ? 'bg-gradient-to-br from-white via-gray-50 to-gray-100 border border-gray-300'
+                  : 'bg-gradient-to-br from-red-700 via-red-800 to-red-900 border border-red-600'
+                : 'bg-slate-700/80 border border-slate-600'
           )}
         >
           {participant.role === 'OBSERVER' ? (
@@ -133,43 +96,19 @@ export default function ParticipantCard({
                     <div className="text-lg">☕</div>
                   </div>
                 ) : isTShirt ? (
-                  // T-Shirt card - same as deck (shirt icon + size label)
-                  <div className="absolute inset-0 flex flex-col items-center justify-center" title={getTooltipText(vote, true)}>
-                    <TShirtIcon
-                      size={String(vote)}
-                      className="w-6 h-6 text-blue-600"
-                    />
-                    <span className="text-[8px] font-bold text-slate-600 mt-0.5">
+                  // T-Shirt card - show only the size letter large and centered
+                  <div className="absolute inset-0 flex items-center justify-center" title={getTooltipText(vote, true)}>
+                    <span className="text-2xl font-bold text-slate-700">
                       {vote}
                     </span>
                   </div>
                 ) : (
-                  // Fibonacci card - same as deck (number/face + suit)
-                  (() => {
-                    const suit = getSuitForValue(String(vote));
-                    const suitColor = suitColors[suit];
-                    const rank = fibonacciToRank[String(vote)] || vote;
-                    return (
-                      <>
-                        {/* Top-left rank and suit */}
-                        <div className="absolute top-0.5 left-0.5 flex flex-col items-center leading-none">
-                          <span className={clsx('font-bold text-[8px]', suitColor)}>{rank}</span>
-                          <span className={clsx('text-[7px] -mt-0.5', suitColor)}>{suit}</span>
-                        </div>
-
-                        {/* Center suit */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className={clsx('text-xl', suitColor)}>{suit}</span>
-                        </div>
-
-                        {/* Bottom-right rank and suit (rotated) */}
-                        <div className="absolute bottom-0.5 right-0.5 flex flex-col items-center leading-none rotate-180">
-                          <span className={clsx('font-bold text-[8px]', suitColor)}>{rank}</span>
-                          <span className={clsx('text-[7px] -mt-0.5', suitColor)}>{suit}</span>
-                        </div>
-                      </>
-                    );
-                  })()
+                  // Fibonacci card - show only the number large and centered
+                  <div className="absolute inset-0 flex items-center justify-center" title={getTooltipText(vote, false)}>
+                    <span className="text-3xl font-bold text-slate-700">
+                      {vote}
+                    </span>
+                  </div>
                 )}
               </>
             ) : (

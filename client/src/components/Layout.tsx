@@ -2,7 +2,6 @@ import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { LogOut, User, Home, Menu, X } from 'lucide-react';
 import { LanguageSelector } from './LanguageSelector';
-import ThemeToggle from './ThemeToggle';
 import { useI18n } from '../i18n';
 import { useState } from 'react';
 
@@ -44,7 +43,6 @@ export default function Layout() {
 
             {/* Desktop User Menu - Right */}
             <div className="hidden md:flex items-center justify-end space-x-2 flex-1">
-              <ThemeToggle />
               <LanguageSelector />
               <Link
                 to="/profile"
@@ -72,7 +70,6 @@ export default function Layout() {
 
             {/* Mobile menu button */}
             <div className="flex md:hidden items-center space-x-2">
-              <ThemeToggle />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700"

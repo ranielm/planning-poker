@@ -34,13 +34,15 @@ export type ParticipantRole = 'moderator' | 'voter' | 'observer';
 
 export interface Participant {
   id: string;
-  oderId: string;
-  odisplayName: string;
+  userId: string;
+  displayName: string;
   avatarUrl?: string;
   role: ParticipantRole;
   hasVoted: boolean;
   vote?: CardValue;
   isOnline: boolean;
+  isBrb: boolean;
+  brbAt: Date | null;
   socketIds: string[]; // Multi-device support
 }
 

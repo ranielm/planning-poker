@@ -32,6 +32,8 @@ export interface ParticipantInfo {
   role: string;
   hasVoted: boolean;
   isOnline: boolean;
+  isBrb: boolean;
+  brbAt: Date | null;
 }
 
 export interface VoteInfo {
@@ -52,7 +54,7 @@ export class GameService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly votingService: VotingService,
-  ) {}
+  ) { }
 
   async getGameState(roomId: string): Promise<GameStateResponse> {
     const room = await this.prisma.room.findUnique({
@@ -93,6 +95,8 @@ export class GameService {
         role: p.role,
         hasVoted: currentRound?.votes.some((v) => v.userId === p.userId) || false,
         isOnline: socketIds.length > 0,
+        isBrb: (p as any).isBrb || false,
+        brbAt: (p as any).brbAt || null,
       };
     });
 
@@ -162,11 +166,11 @@ export class GameService {
     return round;
   }
 
-  async castVote(roomId: string, oderId: string, roundId: string, value: string) {
+  async castVote(roomId: string, userId: string, roundId: string, value: string) {
     // Verify participant is a voter
     const participant = await this.prisma.participant.findUnique({
       where: {
-        userId_roomId: { userId: oderId, roomId },
+        userId_roomId: { userId, roomId },
       },
     });
 
@@ -178,23 +182,28 @@ export class GameService {
       throw new ForbiddenException('Observers cannot vote');
     }
 
-    // Verify round is in voting phase
+    // Verify round exists
     const round = await this.prisma.round.findUnique({
       where: { id: roundId },
     });
 
-    if (!round || round.phase !== GamePhase.VOTING) {
-      throw new ForbiddenException('Cannot vote in this round');
+    if (!round) {
+      throw new ForbiddenException('Round not found');
+    }
+
+    // Allow voting in both VOTING and REVEALED phases (for vote changes)
+    if (round.phase !== GamePhase.VOTING && round.phase !== GamePhase.REVEALED) {
+      throw new ForbiddenException('Cannot vote in this phase');
     }
 
     // Upsert vote
     return this.prisma.vote.upsert({
       where: {
-        roundId_userId: { roundId, userId: oderId },
+        roundId_userId: { roundId, userId },
       },
       create: {
         roomId,
-        userId: oderId,
+        userId,
         roundId,
         value,
       },
@@ -359,6 +368,28 @@ export class GameService {
         revealedAt: round.revealedAt,
         voteCount: round.votes.length,
       };
+    });
+  }
+
+  async setBrbStatus(roomId: string, userId: string, isBrb: boolean) {
+    const participant = await this.prisma.participant.findUnique({
+      where: {
+        userId_roomId: { userId, roomId },
+      },
+    });
+
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
+    }
+
+    return this.prisma.participant.update({
+      where: {
+        userId_roomId: { userId, roomId },
+      },
+      data: {
+        isBrb,
+        brbAt: isBrb ? new Date() : null,
+      } as any, // Using 'any' until Prisma client is regenerated
     });
   }
 }
