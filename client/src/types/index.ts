@@ -48,6 +48,7 @@ export interface GameState {
   votes: VoteInfo[];
   currentRoundId: string | null;
   results: VotingResult | null;
+  dealerId: string | null;
 }
 
 export interface FibonacciResult {
@@ -90,6 +91,7 @@ export interface Room {
   slug: string;
   deckType: DeckType;
   moderatorId: string;
+  dealerId?: string;
   isActive: boolean;
   createdAt: string;
 }

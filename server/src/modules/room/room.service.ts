@@ -9,7 +9,7 @@ const ParticipantRole = { MODERATOR: 'MODERATOR', VOTER: 'VOTER', OBSERVER: 'OBS
 
 @Injectable()
 export class RoomService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(userId: string, dto: CreateRoomDto) {
     const slug = dto.slug || this.generateSlug(dto.name);
@@ -254,5 +254,19 @@ export class RoomService {
       .substring(0, 30);
 
     return `${baseSlug}-${nanoid(6)}`;
+  }
+
+  async assignDealer(roomId: string, moderatorId: string, dealerUserId: string) {
+    const room = await this.findById(roomId);
+
+    if (room.moderatorId !== moderatorId) {
+      throw new ForbiddenException('Only the moderator can assign a dealer');
+    }
+
+    // Update the room
+    return this.prisma.room.update({
+      where: { id: roomId },
+      data: { dealerId: dealerUserId } as any,
+    });
   }
 }

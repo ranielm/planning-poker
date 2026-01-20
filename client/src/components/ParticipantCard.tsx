@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { User, Crown, Eye, Check } from 'lucide-react';
+import { User, Crown, Eye, Check, UserCog } from 'lucide-react';
 import { Participant, ParticipantRole } from '../types';
 
 interface ParticipantCardProps {
@@ -8,6 +8,9 @@ interface ParticipantCardProps {
   isRevealed: boolean;
   isCurrentUser: boolean;
   deckType?: 'FIBONACCI' | 'TSHIRT';
+  isDealer?: boolean;
+  isModeratorView?: boolean;
+  onAssignDealer?: (userId: string) => void;
 }
 
 // No face card mapping - show actual numbers
@@ -39,6 +42,9 @@ export default function ParticipantCard({
   isRevealed,
   isCurrentUser,
   deckType = 'FIBONACCI',
+  isDealer,
+  isModeratorView,
+  onAssignDealer,
 }: ParticipantCardProps) {
   const roleIcons: Record<ParticipantRole, React.ReactNode> = {
     MODERATOR: <Crown className="h-3 w-3 text-yellow-400" />,
@@ -53,7 +59,7 @@ export default function ParticipantCard({
   return (
     <div
       className={clsx(
-        'flex flex-col items-center p-2 rounded-lg transition-all',
+        'flex flex-col items-center p-2 rounded-lg transition-all group relative',
         isCurrentUser && 'bg-blue-900/30 ring-1 ring-blue-400/50',
         !participant.isOnline && 'opacity-50'
       )}
@@ -160,10 +166,30 @@ export default function ParticipantCard({
             {roleIcons[participant.role]}
           </div>
         )}
+        {isDealer && (
+          <div className="absolute -top-1 -left-1 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full p-1 shadow border border-white/20" title="Dealer">
+            <span className="block w-2 h-2 bg-white rounded-full" />
+          </div>
+        )}
         {!participant.isOnline && (
           <div className="absolute -bottom-0.5 -right-0.5 bg-red-500 rounded-full w-2.5 h-2.5 border-2 border-slate-900" />
         )}
       </div>
+
+      {isModeratorView && !isDealer && !isCurrentUser && onAssignDealer && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (confirm(`Assign Dealer role to ${participant.displayName}?`)) {
+              onAssignDealer(participant.userId);
+            }
+          }}
+          className="absolute -right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 bg-indigo-600 text-white rounded-full shadow-lg hover:scale-110 transition-all z-20"
+          title="Assign Dealer"
+        >
+          <UserCog className="h-3 w-3" />
+        </button>
+      )}
 
       {/* Name */}
       <span

@@ -7,9 +7,12 @@ interface PokerTableProps {
   votes: VoteInfo[];
   phase: GamePhase;
   deckType?: 'FIBONACCI' | 'TSHIRT';
+  isModerator?: boolean;
+  dealerId?: string | null;
+  onAssignDealer?: (userId: string) => void;
 }
 
-export default function PokerTable({ participants, votes, phase, deckType = 'FIBONACCI' }: PokerTableProps) {
+export default function PokerTable({ participants, votes, phase, deckType = 'FIBONACCI', isModerator, dealerId, onAssignDealer }: PokerTableProps) {
   const { user } = useAuthStore();
   const isRevealed = phase === 'REVEALED';
 
@@ -65,6 +68,9 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
                 isRevealed={isRevealed}
                 isCurrentUser={participant.userId === user?.id}
                 deckType={deckType}
+                isDealer={participant.userId === dealerId}
+                isModeratorView={isModerator}
+                onAssignDealer={onAssignDealer}
               />
             ))}
           </div>
@@ -128,6 +134,9 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
                 isRevealed={isRevealed}
                 isCurrentUser={participant.userId === user?.id}
                 deckType={deckType}
+                isDealer={participant.userId === dealerId}
+                isModeratorView={isModerator}
+                onAssignDealer={onAssignDealer}
               />
             ))}
           </div>

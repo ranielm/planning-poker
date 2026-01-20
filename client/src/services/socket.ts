@@ -149,6 +149,10 @@ class SocketService {
     return this.emitWithAck('game:setBrb', { isBrb });
   }
 
+  assignDealer(targetUserId: string): Promise<{ success: boolean }> {
+    return this.emitWithAck('room:assignDealer', { targetUserId });
+  }
+
   // Event handling
   on<T = unknown>(event: string, callback: EventCallback<T>): () => void {
     if (!this.listeners.has(event)) {

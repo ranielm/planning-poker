@@ -462,4 +462,29 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException(error.message || 'Failed to get voting history');
     }
   }
+
+  @SubscribeMessage('room:assignDealer')
+  async handleAssignDealer(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { targetUserId: string },
+  ) {
+    const roomId = client.data.roomId;
+    const userId = client.data.user.sub;
+
+    if (!roomId) {
+      throw new WsException('Not in a room');
+    }
+
+    try {
+      await this.roomService.assignDealer(roomId, userId, data.targetUserId);
+
+      // Broadcast update
+      const gameState = await this.gameService.getGameState(roomId);
+      this.server.to(roomId).emit('room:state', gameState);
+
+      return { success: true };
+    } catch (error: any) {
+      throw new WsException(error.message || 'Failed to assign dealer');
+    }
+  }
 }

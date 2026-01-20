@@ -25,6 +25,7 @@ export default function RoomPage() {
     selectedCard,
     deck,
     isModerator,
+    isDealer,
     isBrb, // New
     canVote,
     castVote,
@@ -34,6 +35,7 @@ export default function RoomPage() {
     changeDeck,
     getVotingHistory,
     setBrb, // New
+    assignDealer,
   } = useGameSocket({
     roomSlug: slug || '',
     onKicked: () => navigate('/'),
@@ -161,6 +163,9 @@ export default function RoomPage() {
             votes={gameState.votes}
             phase={gameState.phase}
             deckType={gameState.deckType}
+            isModerator={isModerator}
+            dealerId={gameState.dealerId}
+            onAssignDealer={assignDealer}
           />
 
           {/* Card selection */}
@@ -179,7 +184,7 @@ export default function RoomPage() {
 
         {/* Right sidebar - Moderator controls */}
         <div className="lg:col-span-1">
-          {isModerator && (
+          {(isModerator || isDealer) && (
             <ModeratorControls
               phase={gameState.phase}
               deckType={gameState.deckType}

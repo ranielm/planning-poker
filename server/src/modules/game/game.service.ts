@@ -23,6 +23,7 @@ export interface GameStateResponse {
   votes: VoteInfo[];
   currentRoundId: string | null;
   results: any | null;
+  dealerId: string | null;
 }
 
 export interface ParticipantInfo {
@@ -121,6 +122,7 @@ export class GameService {
       votes,
       currentRoundId: currentRound?.id || null,
       results,
+      dealerId: (room as any).dealerId || null,
     };
   }
 
@@ -133,8 +135,8 @@ export class GameService {
       throw new NotFoundException('Room not found');
     }
 
-    if (room.moderatorId !== moderatorId) {
-      throw new ForbiddenException('Only the moderator can start a new round');
+    if (room.moderatorId !== moderatorId && (room as any).dealerId !== moderatorId) {
+      throw new ForbiddenException('Only the moderator or dealer can start a new round');
     }
 
     // End any active rounds
@@ -234,8 +236,8 @@ export class GameService {
       throw new NotFoundException('Room not found');
     }
 
-    if (room.moderatorId !== moderatorId) {
-      throw new ForbiddenException('Only the moderator can reveal cards');
+    if (room.moderatorId !== moderatorId && (room as any).dealerId !== moderatorId) {
+      throw new ForbiddenException('Only the moderator or dealer can reveal cards');
     }
 
     const currentRound = room.rounds[0];
@@ -272,8 +274,8 @@ export class GameService {
       throw new NotFoundException('Room not found');
     }
 
-    if (room.moderatorId !== moderatorId) {
-      throw new ForbiddenException('Only the moderator can reset the round');
+    if (room.moderatorId !== moderatorId && (room as any).dealerId !== moderatorId) {
+      throw new ForbiddenException('Only the moderator or dealer can reset the round');
     }
 
     // Create a new voting round with the same topic
@@ -290,8 +292,8 @@ export class GameService {
       throw new NotFoundException('Room not found');
     }
 
-    if (room.moderatorId !== moderatorId) {
-      throw new ForbiddenException('Only the moderator can change the deck type');
+    if (room.moderatorId !== moderatorId && (room as any).dealerId !== moderatorId) {
+      throw new ForbiddenException('Only the moderator or dealer can change the deck type');
     }
 
     return this.prisma.room.update({
@@ -316,8 +318,8 @@ export class GameService {
       throw new NotFoundException('Room not found');
     }
 
-    if (room.moderatorId !== moderatorId) {
-      throw new ForbiddenException('Only the moderator can set the topic');
+    if (room.moderatorId !== moderatorId && (room as any).dealerId !== moderatorId) {
+      throw new ForbiddenException('Only the moderator or dealer can set the topic');
     }
 
     // Update room's active topic
