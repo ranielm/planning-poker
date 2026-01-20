@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { Room } from '../types';
-import { Users, Clock, ChevronRight, Loader2, Globe, Lock, Plus } from 'lucide-react';
+import { Users, Clock, ChevronRight, Loader2, Globe, Lock, Plus, RefreshCw } from 'lucide-react';
 import { useI18n } from '../i18n';
 
 interface PublicRoom {
@@ -28,6 +28,18 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingPublic, setIsLoadingPublic] = useState(true);
 
+  const fetchPublicRooms = useCallback(async () => {
+    setIsLoadingPublic(true);
+    try {
+      const response = await api.get<PublicRoom[]>('/rooms/public', { skipAuth: true });
+      setPublicRooms(response.data);
+    } catch (error) {
+      console.error('Failed to fetch public rooms:', error);
+    } finally {
+      setIsLoadingPublic(false);
+    }
+  }, []);
+
   useEffect(() => {
     const fetchRooms = async () => {
       try {
@@ -40,20 +52,9 @@ export default function HomePage() {
       }
     };
 
-    const fetchPublicRooms = async () => {
-      try {
-        const response = await api.get<PublicRoom[]>('/rooms/public', { skipAuth: true });
-        setPublicRooms(response.data);
-      } catch (error) {
-        console.error('Failed to fetch public rooms:', error);
-      } finally {
-        setIsLoadingPublic(false);
-      }
-    };
-
     fetchRooms();
     fetchPublicRooms();
-  }, []);
+  }, [fetchPublicRooms]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -178,9 +179,20 @@ export default function HomePage() {
 
         {/* Public Rooms list */}
         <div>
-          <div className="flex items-center gap-2 mb-4">
-            <Globe className="h-5 w-5 text-green-500 dark:text-green-400" />
-            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">{t.home.publicRooms}</h2>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Globe className="h-5 w-5 text-green-500 dark:text-green-400" />
+              <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">{t.home.publicRooms}</h2>
+            </div>
+            <button
+              onClick={() => fetchPublicRooms()}
+              disabled={isLoadingPublic}
+              className="flex items-center gap-1 px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm rounded-lg transition-colors disabled:opacity-50"
+              title="Refresh public rooms"
+            >
+              <RefreshCw className={`h-4 w-4 ${isLoadingPublic ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
           </div>
           {isLoadingPublic ? (
             <div className="flex items-center justify-center py-8">

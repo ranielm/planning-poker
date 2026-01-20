@@ -39,12 +39,12 @@ export default function Card({
 
   const isTShirt = deckType === 'TSHIRT' || ['S', 'M', 'L', 'XL'].includes(String(value));
   const isJoker = value === '?';
-  const isCoffee = value === '☕';
+  const isBrb = value === '☕' || value === 'BRB';
 
   // Generate tooltip text
   const getTooltipText = () => {
     if (isJoker) return 'Not sure';
-    if (isCoffee) return 'Need a break';
+    if (isBrb) return 'Be Right Back';
     if (isTShirt) {
       const sp = tshirtToSP[String(value)];
       return sp ? `Size ${value} (${sp} SP)` : `Size ${value}`;
@@ -101,15 +101,19 @@ export default function Card({
             <div className="absolute inset-[3px] rounded border border-gray-200" />
 
             {isJoker ? (
-              // Joker card - stylized design
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
-                <div className="text-3xl">🃏</div>
-                <span className="text-[9px] font-bold text-purple-600 mt-0.5 tracking-wide">JOKER</span>
+              // Joker card - Heath Ledger style
+              <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded">
+                <img
+                  src="/joker.png"
+                  alt="Joker"
+                  className="w-full h-full object-cover"
+                />
               </div>
-            ) : isCoffee ? (
-              // Coffee break card
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-2xl">☕</div>
+            ) : isBrb ? (
+              // BRB (Be Right Back) card
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100">
+                <span className="text-2xl font-bold text-amber-600">BRB</span>
+                <span className="text-[8px] text-amber-500 mt-0.5">Be Right Back</span>
               </div>
             ) : isTShirt ? (
               // T-Shirt card - show only the size letter large and centered

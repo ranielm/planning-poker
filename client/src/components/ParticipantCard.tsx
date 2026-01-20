@@ -25,7 +25,7 @@ const tshirtToSP: Record<string, number> = {
 // Get tooltip text for revealed card
 function getTooltipText(vote: string | null, isTShirt: boolean): string {
   if (vote === '?') return 'Not sure';
-  if (vote === '☕') return 'Need a break';
+  if (vote === '☕' || vote === 'BRB') return 'Be Right Back';
   if (isTShirt && vote) {
     const sp = tshirtToSP[vote];
     return sp ? `Size ${vote} (${sp} SP)` : `Size ${vote}`;
@@ -48,7 +48,7 @@ export default function ParticipantCard({
 
   const isTShirt = deckType === 'TSHIRT' || ['S', 'M', 'L', 'XL'].includes(String(vote));
   const isJoker = vote === '?';
-  const isCoffee = vote === '☕';
+  const isBrb = vote === '☕' || vote === 'BRB';
 
   return (
     <div
@@ -85,15 +85,14 @@ export default function ParticipantCard({
                 <div className="absolute inset-0.5 rounded border border-gray-200" />
 
                 {isJoker ? (
-                  // Joker card - same as deck
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 rounded">
-                    <div className="text-lg">🃏</div>
-                    <span className="text-[6px] font-bold text-purple-600 tracking-wide">JOKER</span>
+                  // Joker card - Heath Ledger style
+                  <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded">
+                    <img src="/joker.png" alt="Joker" className="w-full h-full object-cover" />
                   </div>
-                ) : isCoffee ? (
-                  // Coffee break card
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-lg">☕</div>
+                ) : isBrb ? (
+                  // BRB card
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200 rounded">
+                    <span className="text-lg font-bold text-amber-600">BRB</span>
                   </div>
                 ) : isTShirt ? (
                   // T-Shirt card - show only the size letter large and centered
