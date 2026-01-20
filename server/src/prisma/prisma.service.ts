@@ -26,12 +26,16 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
         }
 
         // Dynamic import to avoid issues with bundling
-        this.logger.log('📦 Importing @prisma/adapter-libsql...');
-        const { PrismaLibSql } = await import('@prisma/adapter-libsql');
+        this.logger.log('📦 Importing @prisma/adapter-libsql and @libsql/client...');
+        const { PrismaLibSQL } = await import('@prisma/adapter-libsql');
+        const { createClient } = await import('@libsql/client');
         this.logger.log('📦 Import successful');
 
-        this.logger.log('🔧 Creating PrismaLibSql adapter...');
-        const adapter = new PrismaLibSql({ url: baseUrl, authToken });
+        this.logger.log('🔧 Creating LibSQL client...');
+        const libsql = createClient({ url: baseUrl, authToken });
+
+        this.logger.log('🔧 Creating PrismaLibSQL adapter...');
+        const adapter = new PrismaLibSQL(libsql);
         this.logger.log('🔧 Adapter created');
 
         this.logger.log('🏗️ Instantiating PrismaClient with adapter...');
@@ -101,7 +105,7 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   }
 
   // Expose $queryRaw for raw SQL queries
-  $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Promise<T> {
+  $queryRaw<T = unknown>(query: TemplateStringsArray | any, ...values: any[]): Promise<T> {
     return this.client.$queryRaw(query, ...values);
   }
 
