@@ -10,11 +10,11 @@ function getInitialLanguage(): Language {
     return stored;
   }
 
-  // Check browser language
-  const browserLang = navigator.language;
-  if (browserLang.startsWith('pt')) {
-    return 'pt-BR';
-  }
+  // Check browser language - IGNORED as per requirements, default is always en-US
+  // const browserLang = navigator.language;
+  // if (browserLang.startsWith('pt')) {
+  //   return 'pt-BR';
+  // }
 
   return 'en-US';
 }

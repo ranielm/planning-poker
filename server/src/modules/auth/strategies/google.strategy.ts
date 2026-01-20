@@ -14,6 +14,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
+  authorizationParams(): { [key: string]: string } {
+    return {
+      hl: 'en',
+    };
+  }
+
   async validate(
     accessToken: string,
     refreshToken: string,
