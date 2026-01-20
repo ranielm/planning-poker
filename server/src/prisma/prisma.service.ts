@@ -1,88 +1,105 @@
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { PrismaClient, Prisma } from '@prisma/client';
-import { PrismaLibSql } from '@prisma/adapter-libsql';
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
-  private _client: PrismaClient;
-
-  constructor() {
-    const databaseUrl = process.env.DATABASE_URL || '';
-
-    if (databaseUrl.startsWith('libsql://')) {
-      // Turso remote database - use libSQL adapter
-      this.logger.log('🔗 Initializing Turso remote database...');
-
-      const url = databaseUrl.split('?')[0];
-      const authToken = databaseUrl.includes('authToken=')
-        ? databaseUrl.split('authToken=')[1].split('&')[0]
-        : process.env.TURSO_AUTH_TOKEN;
-
-      const adapter = new PrismaLibSql({ url, authToken });
-      this._client = new PrismaClient({ adapter } as any);
-    } else {
-      // Local SQLite file
-      this.logger.log('📁 Initializing local SQLite database...');
-      this._client = new PrismaClient({
-        log: process.env.NODE_ENV === 'development'
-          ? ['query', 'info', 'warn', 'error']
-          : ['error'],
-      });
-    }
-  }
+  private _client: PrismaClient | null = null;
 
   async onModuleInit() {
+    const databaseUrl = process.env.DATABASE_URL || '';
+
     try {
-      await this._client.$connect();
-      this.logger.log('✅ Database connected successfully');
+      if (databaseUrl.startsWith('libsql://')) {
+        this.logger.log('🔗 Initializing Turso remote database...');
+
+        // Parse URL and auth token
+        const urlObj = new URL(databaseUrl);
+        const baseUrl = `libsql://${urlObj.host}`;
+        const authToken = urlObj.searchParams.get('authToken') || process.env.TURSO_AUTH_TOKEN;
+
+        this.logger.log(`📍 Turso URL: ${baseUrl}`);
+        this.logger.log(`🔑 Auth token present: ${!!authToken}`);
+
+        if (!authToken) {
+          throw new Error('TURSO_AUTH_TOKEN not found in DATABASE_URL or environment');
+        }
+
+        // Dynamic import to avoid issues with bundling
+        const { PrismaLibSql } = await import('@prisma/adapter-libsql');
+
+        const adapter = new PrismaLibSql({ url: baseUrl, authToken });
+        this._client = new PrismaClient({ adapter } as any);
+
+        await this._client.$connect();
+        this.logger.log('✅ Connected to Turso remote database');
+      } else {
+        this.logger.log('📁 Initializing local SQLite database...');
+        this._client = new PrismaClient({
+          log: process.env.NODE_ENV === 'development'
+            ? ['query', 'info', 'warn', 'error']
+            : ['error'],
+        });
+        await this._client.$connect();
+        this.logger.log('✅ Connected to local SQLite database');
+      }
     } catch (error) {
-      this.logger.error('❌ Failed to connect to database', error);
+      this.logger.error('❌ Failed to connect to database');
+      this.logger.error(error);
       throw error;
     }
   }
 
   async onModuleDestroy() {
-    await this._client.$disconnect();
+    if (this._client) {
+      await this._client.$disconnect();
+    }
+  }
+
+  private get client(): PrismaClient {
+    if (!this._client) {
+      throw new Error('PrismaClient not initialized. Did you forget to call onModuleInit?');
+    }
+    return this._client;
   }
 
   // Expose Prisma models via getters
   get user() {
-    return this._client.user;
+    return this.client.user;
   }
 
   get session() {
-    return this._client.session;
+    return this.client.session;
   }
 
   get refreshToken() {
-    return this._client.refreshToken;
+    return this.client.refreshToken;
   }
 
   get room() {
-    return this._client.room;
+    return this.client.room;
   }
 
   get participant() {
-    return this._client.participant;
+    return this.client.participant;
   }
 
   get round() {
-    return this._client.round;
+    return this.client.round;
   }
 
   get vote() {
-    return this._client.vote;
+    return this.client.vote;
   }
 
   // Expose $queryRaw for raw SQL queries
   $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Promise<T> {
-    return this._client.$queryRaw(query, ...values);
+    return this.client.$queryRaw(query, ...values);
   }
 
   // Expose $transaction for complex operations
   $transaction<T>(fn: (prisma: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'>) => Promise<T>): Promise<T> {
-    return this._client.$transaction(fn);
+    return this.client.$transaction(fn);
   }
 
   async cleanDatabase() {
@@ -90,11 +107,11 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
       throw new Error('cleanDatabase is not allowed in production');
     }
 
-    await this._client.vote.deleteMany();
-    await this._client.participant.deleteMany();
-    await this._client.room.deleteMany();
-    await this._client.refreshToken.deleteMany();
-    await this._client.session.deleteMany();
-    await this._client.user.deleteMany();
+    await this.client.vote.deleteMany();
+    await this.client.participant.deleteMany();
+    await this.client.room.deleteMany();
+    await this.client.refreshToken.deleteMany();
+    await this.client.session.deleteMany();
+    await this.client.user.deleteMany();
   }
 }
