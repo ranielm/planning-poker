@@ -182,6 +182,10 @@ export class GameService {
       throw new ForbiddenException('Observers cannot vote');
     }
 
+    if ((participant as any).isBrb) {
+      throw new ForbiddenException('Cannot vote while in BRB mode');
+    }
+
     // Verify round exists
     const round = await this.prisma.round.findUnique({
       where: { id: roundId },

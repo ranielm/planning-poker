@@ -198,14 +198,11 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
   );
 
   // Computed values
-  const isModerator = user ? gameState?.participants.find(p => p.userId === user.id)?.role === 'MODERATOR' : false;
-  const canVote = user
-    ? gameState?.participants.find(p => p.userId === user.id)?.role !== 'OBSERVER' &&
-    gameState?.phase === 'VOTING'
-    : false;
-  const hasVoted = user
-    ? gameState?.participants.find(p => p.userId === user.id)?.hasVoted || false
-    : false;
+  const participant = user && gameState ? gameState.participants.find(p => p.userId === user.id) : null;
+  const isModerator = participant?.role === 'MODERATOR' || false;
+  const isBrb = participant?.isBrb || false;
+  const canVote = (participant?.role && participant.role !== 'OBSERVER' && gameState?.phase === 'VOTING') || false;
+  const hasVoted = participant?.hasVoted || false;
 
   const deck = gameState?.deckType === 'TSHIRT'
     ? ['S', 'M', 'L', 'XL', '?', '☕']
@@ -219,6 +216,7 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     selectedCard,
     deck,
     isModerator,
+    isBrb,
     canVote,
     hasVoted,
 

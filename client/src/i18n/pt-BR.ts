@@ -191,6 +191,18 @@ export const ptBR: Translations = {
     alreadyInRoom: 'Você já está nesta sala.',
   },
 
+  // Session
+  session: {
+    brb: {
+      activeTitle: 'Ausente (BRB)',
+      activeSubtitle: 'Você está no modo Ausente. Seus votos não serão contados para o consenso.',
+      resume: 'Estou de Volta',
+    },
+    overlay: {
+      lockMessage: 'Sessão Bloqueada'
+    }
+  },
+
   // Language
   language: {
     title: 'Idioma',

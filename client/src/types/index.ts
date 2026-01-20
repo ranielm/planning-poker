@@ -30,6 +30,7 @@ export interface Participant {
   role: ParticipantRole;
   hasVoted: boolean;
   isOnline: boolean;
+  isBrb?: boolean;
 }
 
 export interface VoteInfo {

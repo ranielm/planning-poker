@@ -189,6 +189,18 @@ export const enUS = {
     alreadyInRoom: 'You are already in this room.',
   },
 
+  // Session
+  session: {
+    brb: {
+      activeTitle: 'Be Right Back',
+      activeSubtitle: 'You are currently in BRB mode. You won\'t be counted for voting consensus.',
+      resume: 'I\'m Back',
+    },
+    overlay: {
+      lockMessage: 'Session Locked'
+    }
+  },
+
   // Language
   language: {
     title: 'Language',

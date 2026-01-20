@@ -1,91 +1,40 @@
-import { useState } from 'react';
-import { Lock, Unlock, Coffee } from 'lucide-react';
-import { clsx } from 'clsx';
+import { Coffee, Lock } from 'lucide-react';
+import { useI18n } from '../i18n';
 
 interface SessionLockOverlayProps {
-    isLocked: boolean;
-    roomSlug: string;
     onUnlock: () => void;
-    userName?: string;
 }
 
-export default function SessionLockOverlay({
-    isLocked,
-    roomSlug,
-    onUnlock,
-    userName = 'User'
-}: SessionLockOverlayProps) {
-    const [isUnlocking, setIsUnlocking] = useState(false);
-
-    const handleUnlock = async () => {
-        setIsUnlocking(true);
-        try {
-            await onUnlock();
-        } finally {
-            setIsUnlocking(false);
-        }
-    };
-
-    if (!isLocked) return null;
+export default function SessionLockOverlay({ onUnlock }: SessionLockOverlayProps) {
+    const { t } = useI18n();
 
     return (
-        <div className="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-sm flex items-center justify-center">
-            <div className="max-w-md w-full mx-4 text-center">
-                {/* Lock icon animation */}
-                <div className="relative mb-8">
-                    <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-amber-500/20 to-orange-600/20 flex items-center justify-center animate-pulse">
-                        <Lock className="h-12 w-12 text-amber-400" />
-                    </div>
-
-                    {/* Coffee cup floating */}
-                    <div className="absolute top-0 right-1/4 animate-bounce">
-                        <Coffee className="h-8 w-8 text-amber-300/60" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm">
+            <div className="text-center p-8 max-w-md mx-4">
+                <div className="relative inline-block mb-6">
+                    <div className="absolute inset-0 bg-primary-500/20 rounded-full blur-xl animate-pulse"></div>
+                    <div className="bg-slate-800 p-6 rounded-full border-2 border-primary-500 relative">
+                        <Coffee className="h-12 w-12 text-primary-400" />
+                        <div className="absolute -bottom-2 -right-2 bg-slate-900 rounded-full p-2 border border-slate-700">
+                            <Lock className="h-4 w-4 text-slate-400" />
+                        </div>
                     </div>
                 </div>
 
-                {/* Status text */}
-                <h2 className="text-2xl font-bold text-white mb-2">Session Locked</h2>
-                <p className="text-slate-400 mb-2">
-                    Hey <span className="text-amber-400 font-medium">{userName}</span>, you're on a break!
-                </p>
-                <p className="text-slate-500 text-sm mb-8">
-                    Your session is locked to prevent accidental voting. Other participants won't wait for you to reveal cards.
+                <h2 className="text-3xl font-bold text-white mb-3">
+                    {t.session.brb.activeTitle}
+                </h2>
+
+                <p className="text-slate-300 text-lg mb-8 leading-relaxed">
+                    {t.session.brb.activeSubtitle}
                 </p>
 
-                {/* Room info */}
-                <div className="bg-slate-800/50 rounded-lg px-4 py-3 mb-8 border border-slate-700">
-                    <p className="text-slate-400 text-sm">You were in room:</p>
-                    <p className="text-white font-medium">{roomSlug}</p>
-                </div>
-
-                {/* Unlock button */}
                 <button
-                    onClick={handleUnlock}
-                    disabled={isUnlocking}
-                    className={clsx(
-                        'w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-bold text-lg transition-all',
-                        'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700',
-                        'text-white shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40',
-                        isUnlocking && 'opacity-75 cursor-wait'
-                    )}
+                    onClick={onUnlock}
+                    className="px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-xl transition-all hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25 active:scale-95"
                 >
-                    {isUnlocking ? (
-                        <>
-                            <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
-                            Returning to room...
-                        </>
-                    ) : (
-                        <>
-                            <Unlock className="h-5 w-5" />
-                            I'm Back! Unlock Session
-                        </>
-                    )}
+                    {t.session.brb.resume}
                 </button>
-
-                {/* Helper text */}
-                <p className="text-slate-600 text-xs mt-4">
-                    Click to rejoin the voting session
-                </p>
             </div>
         </div>
     );

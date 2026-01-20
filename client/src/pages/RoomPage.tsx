@@ -6,9 +6,11 @@ import CardDeck from '../components/CardDeck';
 import TopicPanel from '../components/TopicPanel';
 import ResultsPanel from '../components/ResultsPanel';
 import ModeratorControls from '../components/ModeratorControls';
+import SessionTimer from '../components/SessionTimer';
+import SessionLockOverlay from '../components/SessionLockOverlay'; // New import
 import { Loader2, AlertCircle, Copy, Check, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
-import SessionTimer from '../components/SessionTimer';
+import { CardValue } from '../types'; // New import
 
 export default function RoomPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -23,6 +25,7 @@ export default function RoomPage() {
     selectedCard,
     deck,
     isModerator,
+    isBrb, // New
     canVote,
     castVote,
     revealCards,
@@ -30,6 +33,7 @@ export default function RoomPage() {
     setTopic,
     changeDeck,
     getVotingHistory,
+    setBrb, // New
   } = useGameSocket({
     roomSlug: slug || '',
     onKicked: () => navigate('/'),
@@ -39,6 +43,14 @@ export default function RoomPage() {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCardSelect = (value: CardValue) => {
+    if (value === '☕') {
+      setBrb(true);
+    } else {
+      castVote(value);
+    }
   };
 
   // Loading state
@@ -81,11 +93,17 @@ export default function RoomPage() {
     return null;
   }
 
-  const voters = gameState.participants.filter((p) => p.role !== 'OBSERVER');
+  // Exclude observers and BRB players from the voter count
+  const voters = gameState.participants.filter((p) => p.role !== 'OBSERVER' && !p.isBrb);
   const votersReady = voters.filter((p) => p.hasVoted).length;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] p-2 sm:p-4 lg:p-6 xl:p-8">
+    <div className="min-h-[calc(100vh-4rem)] p-2 sm:p-4 lg:p-6 xl:p-8 relative">
+      {/* Session Lock Overlay */}
+      {isBrb && (
+        <SessionLockOverlay onUnlock={() => setBrb(false)} />
+      )}
+
       {/* Header */}
       <div className="max-w-screen-2xl mx-auto mb-4 sm:mb-6">
         <div className="flex items-center justify-between">
@@ -151,7 +169,7 @@ export default function RoomPage() {
               <CardDeck
                 deck={deck}
                 selectedCard={selectedCard}
-                onSelectCard={castVote}
+                onSelectCard={handleCardSelect}
                 disabled={gameState.phase !== 'VOTING'}
                 deckType={gameState.deckType}
               />

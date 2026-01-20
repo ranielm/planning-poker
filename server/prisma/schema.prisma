@@ -29,6 +29,7 @@ model User {
   sessions      Session[]
   refreshTokens RefreshToken[]
   roomsOwned    Room[]        @relation("RoomOwner")
+  roomsDealt    Room[]        @relation("RoomDealer")
   participants  Participant[]
   votes         Vote[]
 
@@ -73,6 +74,7 @@ model Room {
   slug        String   @unique
   deckType    String   @default("FIBONACCI") // FIBONACCI or TSHIRT
   moderatorId String
+  dealerId    String?
   isActive    Boolean  @default(true)
   isPublic    Boolean  @default(false) // Public rooms visible to all users
   createdAt   DateTime @default(now())
@@ -83,12 +85,14 @@ model Room {
 
   // Relations
   moderator    User          @relation("RoomOwner", fields: [moderatorId], references: [id])
+  dealer       User?         @relation("RoomDealer", fields: [dealerId], references: [id])
   participants Participant[]
   votes        Vote[]
   rounds       Round[]
 
   @@index([slug])
   @@index([moderatorId])
+  @@index([dealerId])
   @@index([isPublic])
 }
 
