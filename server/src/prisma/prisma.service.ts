@@ -26,11 +26,19 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
         }
 
         // Dynamic import to avoid issues with bundling
+        this.logger.log('📦 Importing @prisma/adapter-libsql...');
         const { PrismaLibSql } = await import('@prisma/adapter-libsql');
+        this.logger.log('📦 Import successful');
 
+        this.logger.log('🔧 Creating PrismaLibSql adapter...');
         const adapter = new PrismaLibSql({ url: baseUrl, authToken });
-        this._client = new PrismaClient({ adapter } as any);
+        this.logger.log('🔧 Adapter created');
 
+        this.logger.log('🏗️ Instantiating PrismaClient with adapter...');
+        this._client = new PrismaClient({ adapter } as any);
+        this.logger.log('🏗️ PrismaClient instantiated');
+
+        this.logger.log('🔌 Connecting to database...');
         await this._client.$connect();
         this.logger.log('✅ Connected to Turso remote database');
       } else {
