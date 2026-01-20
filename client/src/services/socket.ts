@@ -84,6 +84,10 @@ class SocketService {
       this.socket.on('game:deckChanged', (data) => {
         this.emit('game:deckChanged', data);
       });
+
+      this.socket.on('game:brbStatusChanged', (data) => {
+        this.emit('game:brbStatusChanged', data);
+      });
     });
   }
 
@@ -139,6 +143,10 @@ class SocketService {
 
   getVotingHistory(limit = 10): Promise<{ success: boolean; history: VotingHistoryItem[] }> {
     return this.emitWithAck('game:getHistory', { limit });
+  }
+
+  setBrb(isBrb: boolean): Promise<{ success: boolean }> {
+    return this.emitWithAck('game:setBrb', { isBrb });
   }
 
   // Event handling

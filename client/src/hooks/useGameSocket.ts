@@ -56,7 +56,7 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
 
     return () => {
       // Cleanup on unmount
-      socketService.leaveRoom().catch(() => {});
+      socketService.leaveRoom().catch(() => { });
       reset();
       hasConnected.current = false;
     };
@@ -186,11 +186,22 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     [setError]
   );
 
+  const setBrb = useCallback(
+    async (isBrb: boolean) => {
+      try {
+        await socketService.setBrb(isBrb);
+      } catch (error: any) {
+        setError(error.message);
+      }
+    },
+    [setError]
+  );
+
   // Computed values
   const isModerator = user ? gameState?.participants.find(p => p.userId === user.id)?.role === 'MODERATOR' : false;
   const canVote = user
     ? gameState?.participants.find(p => p.userId === user.id)?.role !== 'OBSERVER' &&
-      gameState?.phase === 'VOTING'
+    gameState?.phase === 'VOTING'
     : false;
   const hasVoted = user
     ? gameState?.participants.find(p => p.userId === user.id)?.hasVoted || false
@@ -220,5 +231,6 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     updateRole,
     kickParticipant,
     getVotingHistory,
+    setBrb,
   };
 }

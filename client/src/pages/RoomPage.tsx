@@ -85,9 +85,9 @@ export default function RoomPage() {
   const votersReady = voters.filter((p) => p.hasVoted).length;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] p-4 lg:p-8">
+    <div className="min-h-[calc(100vh-4rem)] p-2 sm:p-4 lg:p-6 xl:p-8">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-6">
+      <div className="max-w-screen-2xl mx-auto mb-4 sm:mb-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{gameState.roomName}</h1>
@@ -120,7 +120,7 @@ export default function RoomPage() {
       </div>
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="max-w-screen-2xl mx-auto grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
         {/* Left sidebar - Topic & Results */}
         <div className="lg:col-span-1 space-y-6">
           <TopicPanel
@@ -137,7 +137,7 @@ export default function RoomPage() {
         </div>
 
         {/* Center - Poker Table */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 xl:col-span-3">
           <PokerTable
             participants={gameState.participants}
             votes={gameState.votes}
