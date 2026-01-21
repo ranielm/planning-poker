@@ -209,7 +209,7 @@ export default function RoomPage() {
           deck={deck}
           selectedCard={selectedCard}
           onSelectCard={handleCardSelect}
-          disabled={gameState.phase !== 'VOTING'}
+          disabled={false}
           deckType={gameState.deckType}
         />
       )}

@@ -227,7 +227,7 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
   const isObserver = participant?.role === 'OBSERVER' || false;
   const isDealer = (participant?.userId && gameState?.dealerId === participant.userId) || false;
   const isBrb = participant?.isBrb || false;
-  const canVote = (participant?.role && participant.role !== 'OBSERVER' && !isDealer && !isBrb && gameState?.phase === 'VOTING') || false;
+  const canVote = (participant?.role && participant.role !== 'OBSERVER' && !isDealer && !isBrb && (gameState?.phase === 'VOTING' || gameState?.phase === 'REVEALED')) || false;
   const hasVoted = participant?.hasVoted || false;
   const myRole = participant?.role || 'VOTER';
 

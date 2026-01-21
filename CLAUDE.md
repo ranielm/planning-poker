@@ -394,3 +394,20 @@ Implemented Observer role functionality allowing users to watch sessions without
 - Existing participants keep their current role when reconnecting
 - New participants use their saved default role preference
 - Role can be toggled anytime during a session
+
+## Allow Vote Changes After Reveal
+Date: 2026-01-21
+
+### Overview:
+Players can now change their votes even after cards have been revealed.
+
+### Changes:
+- `client/src/hooks/useGameSocket.ts`: Updated `canVote` to allow voting in both VOTING and REVEALED phases
+- `client/src/pages/RoomPage.tsx`: Removed `disabled` restriction on CardDeck when phase is REVEALED
+- `server/src/modules/game/game.service.ts`: Already allowed (line 200-203) - votes can be cast/updated in REVEALED phase
+
+### How it works:
+1. After cards are revealed, the card deck remains visible and active
+2. Players can click a different card to change their vote
+3. The vote is updated in real-time and results recalculate
+4. This allows teams to revote without starting a new round
