@@ -193,7 +193,7 @@ export class RoomService {
     });
   }
 
-  // Allow user to toggle their own role between VOTER and OBSERVER
+  // Allow user to toggle their own role between VOTER/MODERATOR and OBSERVER
   async toggleOwnRole(roomId: string, userId: string, saveAsDefault: boolean = false) {
     const participant = await this.prisma.participant.findUnique({
       where: {
@@ -205,10 +205,16 @@ export class RoomService {
       throw new NotFoundException('Participant not found');
     }
 
-    // Toggle between VOTER and OBSERVER
-    const newRole = participant.role === ParticipantRole.VOTER
-      ? ParticipantRole.OBSERVER
-      : ParticipantRole.VOTER;
+    // Toggle: if currently OBSERVER, go back to VOTER (or MODERATOR if they are the room owner)
+    // Otherwise, become OBSERVER
+    let newRole: string;
+    if (participant.role === ParticipantRole.OBSERVER) {
+      // Check if this user is the room moderator
+      const room = await this.prisma.room.findUnique({ where: { id: roomId } });
+      newRole = room?.moderatorId === userId ? ParticipantRole.MODERATOR : ParticipantRole.VOTER;
+    } else {
+      newRole = ParticipantRole.OBSERVER;
+    }
 
     // Update participant role
     const updated = await this.prisma.participant.update({

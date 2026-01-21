@@ -429,3 +429,4 @@ Removed the restriction that prevented moderators from becoming observers. Now a
 2. They can switch between Voter and Observer like any other participant
 3. When set to Observer, the moderator can still use moderator controls (reveal, reset, etc.) but won't participate in voting
 4. This is useful for Scrum Masters or facilitators who don't need to estimate but want to run the session
+5. When toggling back from Observer, the room creator returns to MODERATOR role (not VOTER)
