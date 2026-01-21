@@ -125,7 +125,10 @@ export default function Card({
             ) : (
               // Regular card (Fibonacci) - show only the number large and centered
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-6xl font-bold text-slate-700">
+                <span className={clsx(
+                  'font-bold text-slate-700',
+                  String(value).length === 1 ? 'text-5xl' : 'text-4xl'
+                )}>
                   {value}
                 </span>
               </div>

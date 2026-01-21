@@ -317,3 +317,20 @@ Restored the classic poker table design with dark brown wood border and gold/bra
 
 ### Summary:
 The poker table now has the classic casino look with wood border instead of the simplified emerald design.
+
+## Card Number Size Adjustment
+Date: 2026-01-21
+
+### Overview:
+Adjusted card number sizes to prevent two-digit numbers (like 13) from touching the card border.
+
+### Changes:
+- `client/src/components/Card.tsx`: Dynamic font size based on digit count
+  - Single digit: text-5xl
+  - Two digits: text-4xl
+- `client/src/components/ParticipantCard.tsx`: Same logic for revealed cards on table
+  - Single digit: text-3xl
+  - Two digits: text-2xl
+
+### Summary:
+Numbers now scale appropriately based on their length, ensuring proper spacing within the card borders.

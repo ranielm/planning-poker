@@ -110,7 +110,10 @@ export default function ParticipantCard({
                 ) : (
                   // Fibonacci card - show only the number large and centered
                   <div className="absolute inset-0 flex items-center justify-center" title={getTooltipText(vote, false)}>
-                    <span className="text-3xl font-bold text-slate-700">
+                    <span className={clsx(
+                      'font-bold text-slate-700',
+                      String(vote).length === 1 ? 'text-3xl' : 'text-2xl'
+                    )}>
                       {vote}
                     </span>
                   </div>
