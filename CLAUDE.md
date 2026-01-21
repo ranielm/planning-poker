@@ -334,3 +334,19 @@ Adjusted card number sizes to prevent two-digit numbers (like 13) from touching 
 
 ### Summary:
 Numbers now scale appropriately based on their length, ensuring proper spacing within the card borders.
+
+## Topic Panel Layout Improvement
+Date: 2026-01-21
+
+### Overview:
+Improved the Current Topic display to show ticket number and title on separate lines with tooltips.
+
+### Changes:
+- `client/src/components/TopicPanel.tsx`:
+  - Jira key badge now on its own line
+  - Title on separate line with `line-clamp-2` and tooltip
+  - Description with `line-clamp-2` and tooltip
+  - Added `cursor-default` for hover indication
+
+### Summary:
+The topic panel is now cleaner with ticket and title on separate lines. Full text available via hover tooltip.

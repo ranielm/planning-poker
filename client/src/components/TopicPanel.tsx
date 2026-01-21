@@ -65,18 +65,27 @@ export default function TopicPanel({
       <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Current Topic</h3>
 
       {currentTopic && !showForm ? (
-        <div className="space-y-3">
-          <div className="flex items-start gap-3">
-            {currentTopic.jiraKey && (
-              <span className="px-2 py-1 bg-blue-500/20 text-blue-600 dark:text-blue-400 text-sm rounded font-mono">
-                {currentTopic.jiraKey}
-              </span>
-            )}
-            <h4 className="text-slate-900 dark:text-white font-medium flex-1">{currentTopic.title}</h4>
-          </div>
+        <div className="space-y-2">
+          {currentTopic.jiraKey && (
+            <span className="inline-block px-2 py-1 bg-blue-500/20 text-blue-600 dark:text-blue-400 text-sm rounded font-mono">
+              {currentTopic.jiraKey}
+            </span>
+          )}
+
+          <h4
+            className="text-slate-900 dark:text-white font-medium line-clamp-2 cursor-default"
+            title={currentTopic.title}
+          >
+            {currentTopic.title}
+          </h4>
 
           {currentTopic.description && (
-            <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3">{currentTopic.description}</p>
+            <p
+              className="text-slate-600 dark:text-slate-400 text-sm line-clamp-2 cursor-default"
+              title={currentTopic.description}
+            >
+              {currentTopic.description}
+            </p>
           )}
 
           {currentTopic.jiraUrl && (
