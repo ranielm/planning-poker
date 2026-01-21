@@ -86,7 +86,7 @@ export default function HomePage() {
             <Search className="h-5 w-5 text-blue-500 dark:text-blue-400" />
             <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">{t.home.joinRoom}</h2>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm min-h-[200px] flex flex-col justify-center">
             <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
               Enter a room code or URL to join an existing session instantly.
             </p>
@@ -170,7 +170,7 @@ export default function HomePage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 h-full flex flex-col justify-center items-center">
+              <div className="text-center py-8 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 min-h-[200px] flex flex-col justify-center items-center">
                 <Users className="h-10 w-10 text-slate-400 dark:text-slate-600 mb-3" />
                 <h3 className="font-medium text-slate-700 dark:text-slate-300">{t.home.noRoomsYet}</h3>
                 <p className="text-slate-500 mt-1 text-sm max-w-[200px] mx-auto">
@@ -245,7 +245,7 @@ export default function HomePage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 h-full flex flex-col justify-center items-center">
+              <div className="text-center py-8 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 min-h-[200px] flex flex-col justify-center items-center">
                 <Globe className="h-10 w-10 text-slate-400 dark:text-slate-600 mb-3" />
                 <h3 className="font-medium text-slate-700 dark:text-slate-300">{t.home.noPublicRooms}</h3>
                 <p className="text-slate-500 mt-1 text-sm max-w-[200px] mx-auto">

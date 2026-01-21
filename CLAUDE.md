@@ -284,3 +284,18 @@ Mapped 13 Story Points to King (K) on card faces to maintain traditional playing
 
 ### Summary:
 The 13 SP card now displays as King (K) matching traditional playing card conventions while preserving the actual story point value in tooltips.
+
+## Homepage Card Height Consistency
+Date: 2026-01-21
+
+### Overview:
+Added consistent minimum height to the three dashboard cards on the homepage when they are empty.
+
+### Changes:
+- `client/src/pages/HomePage.tsx`: Added `min-h-[200px]` to:
+  - Join a Room card (always visible)
+  - Your Rooms empty state
+  - Public Rooms empty state
+
+### Summary:
+The three cards on the homepage now have a consistent 200px minimum height when empty, creating a more balanced visual layout. When cards have content (room lists), they grow naturally to accommodate the items.
