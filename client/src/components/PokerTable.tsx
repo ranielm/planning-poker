@@ -59,7 +59,7 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
           <div className="absolute inset-3 rounded-[1.5rem] border border-[#8B7355]/20 pointer-events-none" />
 
           {/* Top row of players */}
-          <div className="flex justify-center gap-3 mb-6 relative z-10">
+          <div className="flex justify-center gap-3 mb-6 relative z-10 flex-wrap">
             {topRow.map((participant) => (
               <ParticipantCard
                 key={participant.userId}
@@ -76,8 +76,8 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
           </div>
 
           {/* Center table area - oval betting area */}
-          <div className="relative mx-auto max-w-lg">
-            {/* Outer oval glow */}
+          <div className="relative mx-auto max-w-lg mb-6 mt-6">
+            {/* ... (center content) ... */}
             <div className="absolute inset-0 rounded-full bg-[#1a5a3a]/50 blur-md" />
 
             {/* Inner betting area */}
@@ -125,7 +125,7 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
           </div>
 
           {/* Bottom row of players */}
-          <div className="flex justify-center gap-3 mt-6 relative z-10">
+          <div className="flex justify-center gap-3 relative z-10 flex-wrap">
             {bottomRow.map((participant) => (
               <ParticipantCard
                 key={participant.userId}
