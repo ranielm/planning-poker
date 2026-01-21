@@ -35,37 +35,31 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
 
   return (
     <div className="relative">
-      {/* THE TABLE SURFACE */}
-      <div className="
-        relative
-        w-full max-w-4xl
-        aspect-[2/1] md:aspect-[2.5/1]
-        bg-emerald-900/80
-        border-[12px] border-emerald-800/50
-        rounded-[100px]
-        shadow-2xl
-        flex items-center justify-center
-        backdrop-blur-sm
-        mx-auto
-      ">
-        {/* Felt texture overlay */}
-        <div className="absolute inset-0 rounded-[88px] opacity-20 pointer-events-none"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-          }}
-        />
+      {/* Outer table rim - dark brown wood */}
+      <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-[#4a3728] via-[#3d2d20] to-[#2a1f16] shadow-2xl" />
 
-        {/* Table Logo */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-          <div className="text-emerald-100 font-bold text-4xl sm:text-6xl uppercase tracking-widest select-none">
-            POKER
-          </div>
-        </div>
+      {/* Inner wood rim highlight */}
+      <div className="absolute inset-1 rounded-[2.3rem] bg-gradient-to-b from-[#5c4332] to-[#3d2d20] opacity-50" />
 
-        {/* Content Container - Needs to break out of flex center for positioning */}
-        <div className="absolute inset-0">
+      {/* Gold/brass edge */}
+      <div className="absolute inset-2 rounded-[2.1rem] border-2 border-[#8B7355]/40" />
+
+      {/* Inner padding */}
+      <div className="relative p-4">
+        {/* Table felt surface */}
+        <div className="poker-table-felt rounded-[1.8rem] p-8 min-h-[280px] shadow-inner relative">
+          {/* Felt texture overlay */}
+          <div className="absolute inset-0 rounded-[1.8rem] opacity-10 pointer-events-none"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+            }}
+          />
+
+          {/* Inner felt border - subtle gold line */}
+          <div className="absolute inset-3 rounded-[1.5rem] border border-[#8B7355]/20 pointer-events-none" />
+
           {/* Top row of players */}
-          <div className="absolute -top-12 left-0 right-0 flex justify-center gap-4 flex-wrap z-10 px-8">
+          <div className="flex justify-center gap-3 mb-6 relative z-10">
             {topRow.map((participant) => (
               <ParticipantCard
                 key={participant.userId}
@@ -81,12 +75,20 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
             ))}
           </div>
 
-          {/* Center Info Area */}
-          <div className="absolute inset-0 flex items-center justify-center z-20">
-            <div className="bg-emerald-950/50 rounded-full px-8 py-4 border border-emerald-500/30 backdrop-blur-md">
+          {/* Center table area - oval betting area */}
+          <div className="relative mx-auto max-w-lg">
+            {/* Outer oval glow */}
+            <div className="absolute inset-0 rounded-full bg-[#1a5a3a]/50 blur-md" />
+
+            {/* Inner betting area */}
+            <div className="relative bg-gradient-to-b from-[#1e6b45]/70 to-[#145535]/70 rounded-full py-5 px-10 border border-[#8B7355]/30">
+              {/* Inner decorative line */}
+              <div className="absolute inset-3 rounded-full border border-[#8B7355]/15" />
+
+              {/* Content */}
               <div className="text-center relative z-10">
                 {phase === 'WAITING' && (
-                  <p className="text-emerald-200/80 text-sm font-medium tracking-wide">
+                  <p className="text-green-200/60 text-sm font-medium tracking-wide">
                     Waiting for topic...
                   </p>
                 )}
@@ -104,8 +106,8 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
                     </div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-white font-bold text-xl">{votedCount}</span>
-                      <span className="text-emerald-200/50 text-sm">/</span>
-                      <span className="text-emerald-200/50 text-sm">{totalVoters}</span>
+                      <span className="text-green-200/50 text-sm">/</span>
+                      <span className="text-green-200/50 text-sm">{totalVoters}</span>
                     </div>
                   </div>
                 )}
@@ -123,7 +125,7 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
           </div>
 
           {/* Bottom row of players */}
-          <div className="absolute -bottom-12 left-0 right-0 flex justify-center gap-4 flex-wrap z-10 px-8">
+          <div className="flex justify-center gap-3 mt-6 relative z-10">
             {bottomRow.map((participant) => (
               <ParticipantCard
                 key={participant.userId}
@@ -140,7 +142,7 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
           </div>
 
           {/* Dealer button - decorative */}
-          <div className="absolute top-[40%] right-[5%] w-8 h-8 rounded-full bg-gradient-to-b from-white to-gray-100 border-2 border-gray-300 shadow-lg flex items-center justify-center z-10">
+          <div className="absolute top-6 right-6 w-8 h-8 rounded-full bg-gradient-to-b from-white to-gray-100 border-2 border-gray-300 shadow-lg flex items-center justify-center">
             <span className="text-xs font-bold text-gray-700">D</span>
           </div>
         </div>

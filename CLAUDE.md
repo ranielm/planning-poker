@@ -299,3 +299,21 @@ Added consistent minimum height to the three dashboard cards on the homepage whe
 
 ### Summary:
 The three cards on the homepage now have a consistent 200px minimum height when empty, creating a more balanced visual layout. When cards have content (room lists), they grow naturally to accommodate the items.
+
+## Poker Table Wood Border Restoration
+Date: 2026-01-21
+
+### Overview:
+Restored the classic poker table design with dark brown wood border and gold/brass edge accents.
+
+### Changes:
+- `client/src/components/PokerTable.tsx`: Reverted table styling to previous design with:
+  - Outer dark brown wood rim with gradient (from-[#4a3728] via-[#3d2d20] to-[#2a1f16])
+  - Inner wood rim highlight
+  - Gold/brass edge border
+  - Green felt surface with texture overlay
+  - Oval betting area in center with decorative borders
+  - Kept all new props (deckType, isModerator, dealerId, onAssignDealer)
+
+### Summary:
+The poker table now has the classic casino look with wood border instead of the simplified emerald design.
