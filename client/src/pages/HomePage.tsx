@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { Room } from '../types';
-import { Users, Clock, ChevronRight, Loader2, Globe, Lock, Plus, RefreshCw, Search } from 'lucide-react';
+import { Users, Clock, ChevronRight, Loader2, Globe, Lock, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
 import { useI18n } from '../i18n';
 
 interface PublicRoom {
@@ -27,6 +27,7 @@ export default function HomePage() {
   const [publicRooms, setPublicRooms] = useState<PublicRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingPublic, setIsLoadingPublic] = useState(true);
+  const [deletingRoomId, setDeletingRoomId] = useState<string | null>(null);
 
   const fetchPublicRooms = useCallback(async () => {
     setIsLoadingPublic(true);
@@ -55,6 +56,28 @@ export default function HomePage() {
     fetchRooms();
     fetchPublicRooms();
   }, [fetchPublicRooms]);
+
+  const handleDeleteRoom = async (roomId: string, roomName: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!confirm(`Are you sure you want to delete "${roomName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingRoomId(roomId);
+    try {
+      await api.delete(`/rooms/${roomId}`);
+      setRooms((prev) => prev.filter((r) => r.id !== roomId));
+      // Also remove from public rooms if it was there
+      setPublicRooms((prev) => prev.filter((r) => r.id !== roomId));
+    } catch (error) {
+      console.error('Failed to delete room:', error);
+      alert('Failed to delete room. Please try again.');
+    } finally {
+      setDeletingRoomId(null);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -144,29 +167,45 @@ export default function HomePage() {
             ) : rooms.length > 0 ? (
               <div className="space-y-3">
                 {rooms.map((room) => (
-                  <Link
+                  <div
                     key={room.id}
-                    to={`/poker/${room.slug}`}
-                    className="block bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 hover:border-primary-500 transition-colors group shadow-sm"
+                    className="relative bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-primary-500 transition-colors group shadow-sm"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-medium text-slate-900 dark:text-white group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors truncate">
-                          {room.name}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-500 dark:text-slate-400">
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {formatDate(room.createdAt)}
-                          </span>
-                          <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-[10px]">
-                            {room.deckType}
-                          </span>
+                    <Link
+                      to={`/poker/${room.slug}`}
+                      className="block p-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="min-w-0 flex-1 pr-8">
+                          <h3 className="font-medium text-slate-900 dark:text-white group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors truncate">
+                            {room.name}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {formatDate(room.createdAt)}
+                            </span>
+                            <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-[10px]">
+                              {room.deckType}
+                            </span>
+                          </div>
                         </div>
+                        <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-primary-500 transition-colors shrink-0" />
                       </div>
-                      <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-primary-500 transition-colors shrink-0" />
-                    </div>
-                  </Link>
+                    </Link>
+                    <button
+                      onClick={(e) => handleDeleteRoom(room.id, room.name, e)}
+                      disabled={deletingRoomId === room.id}
+                      className="absolute top-3 right-3 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
+                      title="Delete room"
+                    >
+                      {deletingRoomId === room.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 ))}
               </div>
             ) : (

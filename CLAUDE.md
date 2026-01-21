@@ -532,3 +532,69 @@ ALTER TABLE User ADD COLUMN defaultRole TEXT DEFAULT 'VOTER';
 
 ### Summary:
 The migration was executed via Turso HTTP API, adding the `defaultRole` column to the User table. OAuth and user registration now work correctly.
+
+## Role Toggle UX Simplification
+Date: 2026-01-21
+
+### Overview:
+Simplified the role toggle component from a complex dropdown menu to a simple click-to-toggle button.
+
+### Changes:
+- `client/src/components/RoleToggle.tsx`:
+  - Removed dropdown menu with "Just for this session" and "Save as default" options
+  - Converted to simple toggle button that changes role on click
+  - Shows current role with appropriate icon (Eye for Observer, User for Voter)
+  - Added loading state with opacity and cursor changes
+  - Tooltip indicates what clicking will do
+
+### How it works:
+1. Click the button to immediately toggle between Voter and Observer
+2. Button shows current role with colored badge styling
+3. Disabled state during API call prevents double-toggling
+4. Role changes are applied immediately to the current session
+
+### Summary:
+The role toggle is now more intuitive - one click toggles the role without requiring menu interaction. The "save as default" feature was removed for simplicity.
+
+## Delete Room Feature
+Date: 2026-01-21
+
+### Overview:
+Added ability for room creators to delete their rooms from the homepage with a trash icon button.
+
+### Changes:
+- `client/src/pages/HomePage.tsx`:
+  - Added `Trash2` icon import from lucide-react
+  - Added `deletingRoomId` state for loading indication
+  - Added `handleDeleteRoom()` function with:
+    - Confirmation dialog before deletion
+    - API call to DELETE `/rooms/:id`
+    - Removes room from both user rooms and public rooms lists
+    - Error handling with alert message
+  - Modified room cards in "Your Rooms" section:
+    - Changed from Link to div wrapper for proper button positioning
+    - Added absolute-positioned trash button in top-right corner
+    - Button shows loading spinner while deleting
+    - Red hover color for delete action
+
+### Backend Support:
+- Server already has DELETE `/rooms/:id` endpoint (room.controller.ts:63-72)
+- Only the room moderator (creator) can delete the room (room.service.ts:128-140)
+
+### How it works:
+1. User sees trash icon on their room cards in "Your Rooms" section
+2. Clicking shows confirmation: "Are you sure you want to delete 'Room Name'?"
+3. On confirm, room is deleted via API and removed from the list
+4. Public rooms are also updated if the room was public
+
+## Poker Table Height Restore
+Date: 2026-01-21
+
+### Overview:
+Restored the poker table felt minimum height back to the original 280px.
+
+### Changes:
+- `client/src/components/PokerTable.tsx`: Changed `min-h-[320px]` back to `min-h-[280px]`
+
+### Summary:
+The table height was increased to 320px in an earlier fix, but the original 280px is correct now that observers are displayed outside the table.
