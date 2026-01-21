@@ -4,18 +4,12 @@ import { clsx } from 'clsx';
 
 interface RoleToggleProps {
   isObserver: boolean;
-  isModerator: boolean;
   onToggle: (saveAsDefault: boolean) => Promise<string | null>;
 }
 
-export default function RoleToggle({ isObserver, isModerator, onToggle }: RoleToggleProps) {
+export default function RoleToggle({ isObserver, onToggle }: RoleToggleProps) {
   const [isToggling, setIsToggling] = useState(false);
   const [showSaveOption, setShowSaveOption] = useState(false);
-
-  // Moderator cannot toggle their role
-  if (isModerator) {
-    return null;
-  }
 
   const handleToggle = async (saveAsDefault: boolean = false) => {
     setIsToggling(true);

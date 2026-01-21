@@ -126,7 +126,6 @@ export default function RoomPage() {
           <div className="flex items-center gap-3">
             <RoleToggle
               isObserver={isObserver}
-              isModerator={isModerator}
               onToggle={toggleRole}
             />
             <button

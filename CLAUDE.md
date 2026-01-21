@@ -387,7 +387,7 @@ Implemented Observer role functionality allowing users to watch sessions without
    - Card deck is hidden
    - Not counted in voting statistics or consensus
    - Can see all results when revealed
-4. Moderator cannot become an observer (they need to vote)
+4. All users (including moderators) can become observers
 5. User's preference is stored in database and applied when joining new rooms
 
 ### Behavior:
@@ -411,3 +411,21 @@ Players can now change their votes even after cards have been revealed.
 2. Players can click a different card to change their vote
 3. The vote is updated in real-time and results recalculate
 4. This allows teams to revote without starting a new round
+
+## Moderator Can Become Observer
+Date: 2026-01-21
+
+### Overview:
+Removed the restriction that prevented moderators from becoming observers. Now all users, including the room moderator, can toggle between Voter and Observer roles.
+
+### Changes:
+- `server/src/modules/room/room.service.ts`: Removed the `ForbiddenException` check that blocked moderators from toggling their role
+- `client/src/components/RoleToggle.tsx`:
+  - Removed the `if (isModerator) return null;` check
+  - Removed `isModerator` prop from the interface
+
+### How it works:
+1. Moderator (room creator) can now click the role toggle button
+2. They can switch between Voter and Observer like any other participant
+3. When set to Observer, the moderator can still use moderator controls (reveal, reset, etc.) but won't participate in voting
+4. This is useful for Scrum Masters or facilitators who don't need to estimate but want to run the session

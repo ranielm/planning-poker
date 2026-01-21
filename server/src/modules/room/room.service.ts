@@ -195,13 +195,6 @@ export class RoomService {
 
   // Allow user to toggle their own role between VOTER and OBSERVER
   async toggleOwnRole(roomId: string, userId: string, saveAsDefault: boolean = false) {
-    const room = await this.findById(roomId);
-
-    // Moderator cannot become observer
-    if (room.moderatorId === userId) {
-      throw new ForbiddenException('Moderator cannot change their role');
-    }
-
     const participant = await this.prisma.participant.findUnique({
       where: {
         userId_roomId: { userId, roomId },
