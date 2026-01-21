@@ -17,22 +17,22 @@ export default function CardDeck({
   deckType = 'FIBONACCI',
 }: CardDeckProps) {
   return (
-    <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-      <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 text-center">
-        Select your estimate
-      </h3>
-      <div className="flex flex-wrap justify-center gap-3">
-        {deck.map((value) => (
-          <Card
-            key={String(value)}
-            value={value}
-            isSelected={selectedCard === value}
-            onClick={() => onSelectCard(value)}
-            isDisabled={disabled}
-            deckType={deckType}
-            size="md"
-          />
-        ))}
+    <div className="fixed bottom-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent z-40 transition-transform duration-300">
+      <div className="max-w-[1600px] mx-auto">
+        <h3 className="sr-only">Select your estimate</h3>
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-4 md:gap-6">
+          {deck.map((value) => (
+            <Card
+              key={String(value)}
+              value={value}
+              isSelected={selectedCard === value}
+              onClick={() => onSelectCard(value)}
+              isDisabled={disabled}
+              deckType={deckType}
+              size="lg"
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -107,7 +107,7 @@ export default function RoomPage() {
       )}
 
       {/* Header */}
-      <div className="max-w-screen-2xl mx-auto mb-4 sm:mb-6">
+      <div className="max-w-[1600px] mx-auto mb-4 sm:mb-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{gameState.roomName}</h1>
@@ -140,7 +140,7 @@ export default function RoomPage() {
       </div>
 
       {/* Main content */}
-      <div className="max-w-screen-2xl mx-auto grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 pb-32">
         {/* Left sidebar - Topic & Results */}
         <div className="lg:col-span-1 space-y-6">
           <TopicPanel
@@ -167,19 +167,6 @@ export default function RoomPage() {
             dealerId={gameState.dealerId}
             onAssignDealer={assignDealer}
           />
-
-          {/* Card selection */}
-          {canVote && (
-            <div className="mt-6">
-              <CardDeck
-                deck={deck}
-                selectedCard={selectedCard}
-                onSelectCard={handleCardSelect}
-                disabled={gameState.phase !== 'VOTING'}
-                deckType={gameState.deckType}
-              />
-            </div>
-          )}
         </div>
 
         {/* Right sidebar - Moderator controls */}
@@ -205,6 +192,17 @@ export default function RoomPage() {
           )}
         </div>
       </div>
+
+      {/* Fixed Card Deck */}
+      {canVote && (
+        <CardDeck
+          deck={deck}
+          selectedCard={selectedCard}
+          onSelectCard={handleCardSelect}
+          disabled={gameState.phase !== 'VOTING'}
+          deckType={gameState.deckType}
+        />
+      )}
     </div>
   );
 }
