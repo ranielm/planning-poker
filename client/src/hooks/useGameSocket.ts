@@ -27,6 +27,14 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
   } = useGameStore();
 
   const hasConnected = useRef(false);
+  const onKickedRef = useRef(onKicked);
+  const navigateRef = useRef(navigate);
+
+  // Keep refs updated
+  useEffect(() => {
+    onKickedRef.current = onKicked;
+    navigateRef.current = navigate;
+  }, [onKicked, navigate]);
 
   // Connect and join room
   useEffect(() => {
@@ -62,7 +70,7 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     };
   }, [token, roomSlug]);
 
-  // Subscribe to socket events
+  // Subscribe to socket events (runs once on mount)
   useEffect(() => {
     const unsubscribers: (() => void)[] = [];
 
@@ -75,8 +83,8 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     unsubscribers.push(
       socketService.on('room:kicked', () => {
         setError('You have been removed from the room');
-        onKicked?.();
-        navigate('/');
+        onKickedRef.current?.();
+        navigateRef.current('/');
       })
     );
 
@@ -95,7 +103,8 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     return () => {
       unsubscribers.forEach((unsub) => unsub());
     };
-  }, [onKicked, navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Actions
   const castVote = useCallback(

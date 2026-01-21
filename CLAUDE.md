@@ -430,3 +430,22 @@ Removed the restriction that prevented moderators from becoming observers. Now a
 3. When set to Observer, the moderator can still use moderator controls (reveal, reset, etc.) but won't participate in voting
 4. This is useful for Scrum Masters or facilitators who don't need to estimate but want to run the session
 5. When toggling back from Observer, the room creator returns to MODERATOR role (not VOTER)
+
+## Fix: Role Toggle Causing UI Freeze
+Date: 2026-01-21
+
+### Overview:
+Fixed a bug where toggling user role (Voter/Observer) caused the application to freeze, requiring a page refresh.
+
+### Problem:
+The `useEffect` hook for socket event listeners had `[onKicked, navigate]` as dependencies. Since `navigate` from React Router creates a new reference on each render, the useEffect was re-running constantly, causing listener cleanup/recreation cycles that interfered with incoming socket events.
+
+### Solution:
+- `client/src/hooks/useGameSocket.ts`:
+  - Added `onKickedRef` and `navigateRef` refs to hold stable references
+  - Added a separate useEffect to keep refs updated
+  - Changed socket events useEffect to use refs instead of direct dependencies
+  - Changed dependency array to `[]` (runs once on mount)
+
+### Technical Details:
+When socket events like `room:state` were emitted after a role toggle, the listener was sometimes in the middle of being recreated due to the dependency change, causing the event to be missed or processed incorrectly. Using refs ensures the listeners are stable and only created once.
