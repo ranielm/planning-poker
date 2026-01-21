@@ -49,7 +49,7 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
         {/* Inner padding */}
         <div className="relative p-4">
           {/* Table felt surface */}
-          <div className="poker-table-felt rounded-[1.8rem] p-8 min-h-[280px] shadow-inner relative">
+          <div className="poker-table-felt rounded-[1.8rem] p-8 min-h-[320px] shadow-inner relative">
             {/* Felt texture overlay */}
             <div className="absolute inset-0 rounded-[1.8rem] opacity-10 pointer-events-none"
               style={{
