@@ -111,11 +111,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Get room by slug
       const room = await this.roomService.findBySlug(data.roomSlug);
 
+      // Determine role: explicit > user preference > default VOTER
+      let role = data.role;
+      if (!role) {
+        // Check if user already exists in room (preserve existing role)
+        const existingParticipant = room.participants.find(p => p.userId === userId);
+        if (existingParticipant) {
+          role = existingParticipant.role as ParticipantRole;
+        } else {
+          // New participant - use their default preference
+          role = await this.roomService.getUserDefaultRole(userId) as ParticipantRole;
+        }
+      }
+
       // Join the room in database
       await this.roomService.joinRoom(
         room.id,
         userId,
-        data.role || 'VOTER',
+        role,
       );
 
       // Add socket to participant's socket list (multi-device support)
@@ -485,6 +498,39 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return { success: true };
     } catch (error: any) {
       throw new WsException(error.message || 'Failed to assign dealer');
+    }
+  }
+
+  @SubscribeMessage('room:toggleRole')
+  async handleToggleRole(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { saveAsDefault?: boolean },
+  ) {
+    const roomId = client.data.roomId;
+    const userId = client.data.user.sub;
+
+    if (!roomId) {
+      throw new WsException('Not in a room');
+    }
+
+    try {
+      const updated = await this.roomService.toggleOwnRole(
+        roomId,
+        userId,
+        data?.saveAsDefault || false,
+      );
+
+      // Broadcast update
+      const gameState = await this.gameService.getGameState(roomId);
+      this.server.to(roomId).emit('room:participantUpdated', {
+        userId,
+        role: updated.role,
+      });
+      this.server.to(roomId).emit('room:state', gameState);
+
+      return { success: true, newRole: updated.role };
+    } catch (error: any) {
+      throw new WsException(error.message || 'Failed to toggle role');
     }
   }
 }

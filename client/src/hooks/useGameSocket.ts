@@ -208,13 +208,28 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     [setError]
   );
 
+  const toggleRole = useCallback(
+    async (saveAsDefault: boolean = false) => {
+      try {
+        const result = await socketService.toggleRole(saveAsDefault);
+        return result.newRole;
+      } catch (error: any) {
+        setError(error.message);
+        return null;
+      }
+    },
+    [setError]
+  );
+
   // Computed values
   const participant = user && gameState ? gameState.participants.find(p => p.userId === user.id) : null;
   const isModerator = participant?.role === 'MODERATOR' || false;
+  const isObserver = participant?.role === 'OBSERVER' || false;
   const isDealer = (participant?.userId && gameState?.dealerId === participant.userId) || false;
   const isBrb = participant?.isBrb || false;
   const canVote = (participant?.role && participant.role !== 'OBSERVER' && !isDealer && !isBrb && gameState?.phase === 'VOTING') || false;
   const hasVoted = participant?.hasVoted || false;
+  const myRole = participant?.role || 'VOTER';
 
   const deck = gameState?.deckType === 'TSHIRT'
     ? ['S', 'M', 'L', 'XL', '?', '☕']
@@ -228,10 +243,12 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     selectedCard,
     deck,
     isModerator,
+    isObserver,
     isDealer,
     isBrb,
     canVote,
     hasVoted,
+    myRole,
 
     // Actions
     castVote,
@@ -244,5 +261,6 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     getVotingHistory,
     setBrb,
     assignDealer,
+    toggleRole,
   };
 }

@@ -193,6 +193,56 @@ export class RoomService {
     });
   }
 
+  // Allow user to toggle their own role between VOTER and OBSERVER
+  async toggleOwnRole(roomId: string, userId: string, saveAsDefault: boolean = false) {
+    const room = await this.findById(roomId);
+
+    // Moderator cannot become observer
+    if (room.moderatorId === userId) {
+      throw new ForbiddenException('Moderator cannot change their role');
+    }
+
+    const participant = await this.prisma.participant.findUnique({
+      where: {
+        userId_roomId: { userId, roomId },
+      },
+    });
+
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
+    }
+
+    // Toggle between VOTER and OBSERVER
+    const newRole = participant.role === ParticipantRole.VOTER
+      ? ParticipantRole.OBSERVER
+      : ParticipantRole.VOTER;
+
+    // Update participant role
+    const updated = await this.prisma.participant.update({
+      where: { id: participant.id },
+      data: { role: newRole },
+    });
+
+    // Optionally save as user's default preference
+    if (saveAsDefault) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { defaultRole: newRole },
+      });
+    }
+
+    return updated;
+  }
+
+  // Get user's default role preference
+  async getUserDefaultRole(userId: string): Promise<string> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { defaultRole: true },
+    });
+    return user?.defaultRole || ParticipantRole.VOTER;
+  }
+
   async addSocketToParticipant(roomId: string, userId: string, socketId: string) {
     const participant = await this.prisma.participant.findUnique({
       where: {

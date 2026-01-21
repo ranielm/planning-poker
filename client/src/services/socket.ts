@@ -153,6 +153,10 @@ class SocketService {
     return this.emitWithAck('room:assignDealer', { targetUserId });
   }
 
+  toggleRole(saveAsDefault: boolean = false): Promise<{ success: boolean; newRole: string }> {
+    return this.emitWithAck('room:toggleRole', { saveAsDefault });
+  }
+
   // Event handling
   on<T = unknown>(event: string, callback: EventCallback<T>): () => void {
     if (!this.listeners.has(event)) {

@@ -25,6 +25,9 @@ model User {
   oauthProvider String? // 'github', 'google', etc.
   oauthId       String? // Provider's user ID
 
+  // User preferences
+  defaultRole String @default("VOTER") // VOTER or OBSERVER - user's preferred role when joining rooms
+
   // Relations
   sessions      Session[]
   refreshTokens RefreshToken[]

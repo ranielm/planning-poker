@@ -7,10 +7,11 @@ import TopicPanel from '../components/TopicPanel';
 import ResultsPanel from '../components/ResultsPanel';
 import ModeratorControls from '../components/ModeratorControls';
 import SessionTimer from '../components/SessionTimer';
-import SessionLockOverlay from '../components/SessionLockOverlay'; // New import
+import SessionLockOverlay from '../components/SessionLockOverlay';
+import RoleToggle from '../components/RoleToggle';
 import { Loader2, AlertCircle, Copy, Check, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
-import { CardValue } from '../types'; // New import
+import { CardValue } from '../types';
 
 export default function RoomPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -25,8 +26,9 @@ export default function RoomPage() {
     selectedCard,
     deck,
     isModerator,
+    isObserver,
     isDealer,
-    isBrb, // New
+    isBrb,
     canVote,
     castVote,
     revealCards,
@@ -34,8 +36,9 @@ export default function RoomPage() {
     setTopic,
     changeDeck,
     getVotingHistory,
-    setBrb, // New
+    setBrb,
     assignDealer,
+    toggleRole,
   } = useGameSocket({
     roomSlug: slug || '',
     onKicked: () => navigate('/'),
@@ -120,22 +123,29 @@ export default function RoomPage() {
               <SessionTimer />
             </div>
           </div>
-          <button
-            onClick={copyRoomLink}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg transition-colors"
-          >
-            {copied ? (
-              <>
-                <Check className="h-4 w-4 text-green-500 dark:text-green-400" />
-                Copied!
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4" />
-                Copy Link
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-3">
+            <RoleToggle
+              isObserver={isObserver}
+              isModerator={isModerator}
+              onToggle={toggleRole}
+            />
+            <button
+              onClick={copyRoomLink}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg transition-colors"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4 text-green-500 dark:text-green-400" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" />
+                  Copy Link
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

@@ -350,3 +350,47 @@ Improved the Current Topic display to show ticket number and title on separate l
 
 ### Summary:
 The topic panel is now cleaner with ticket and title on separate lines. Full text available via hover tooltip.
+
+## Observer Role Feature
+Date: 2026-01-21
+
+### Overview:
+Implemented Observer role functionality allowing users to watch sessions without participating in voting. Observers don't count toward consensus and their preference is saved for future sessions.
+
+### Database Changes:
+- `server/prisma/schema.prisma`: Added `defaultRole` field to User model (default: "VOTER")
+
+### Server Changes:
+- `server/src/modules/room/room.service.ts`:
+  - Added `toggleOwnRole()` method - allows users to switch between VOTER/OBSERVER
+  - Added `getUserDefaultRole()` method - retrieves user's saved preference
+  - Moderators cannot become observers (enforced)
+- `server/src/gateway/game.gateway.ts`:
+  - Updated `room:join` to use user's default role preference for new participants
+  - Added `room:toggleRole` socket event for role switching
+
+### Client Changes:
+- `client/src/services/socket.ts`: Added `toggleRole()` method
+- `client/src/hooks/useGameSocket.ts`:
+  - Added `toggleRole` callback
+  - Added `isObserver` and `myRole` computed values
+- `client/src/components/RoleToggle.tsx`: New component with:
+  - Visual indicator (Eye for Observer, User for Voter)
+  - Dropdown to choose "Just for this session" or "Save as my default"
+- `client/src/pages/RoomPage.tsx`: Added RoleToggle to header
+
+### How it works:
+1. Users can click the role button in the room header to toggle between Voter and Observer
+2. When toggling, they can choose to save it as their default for future rooms
+3. Observer role:
+   - Cannot vote
+   - Card deck is hidden
+   - Not counted in voting statistics or consensus
+   - Can see all results when revealed
+4. Moderator cannot become an observer (they need to vote)
+5. User's preference is stored in database and applied when joining new rooms
+
+### Behavior:
+- Existing participants keep their current role when reconnecting
+- New participants use their saved default role preference
+- Role can be toggled anytime during a session
