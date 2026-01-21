@@ -23,7 +23,12 @@
       "Bash(tasklist)",
       "Bash(git reset:*)",
       "Bash(npm run build:*)",
-      "Bash(git revert:*)"
+      "Bash(git revert:*)",
+      "Bash(turso --version:*)",
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ls:*)",
+      "Bash(npx:*)"
     ]
   }
 }
