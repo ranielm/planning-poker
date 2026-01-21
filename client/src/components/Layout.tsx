@@ -23,7 +23,7 @@ export default function Layout() {
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             {/* Logo - Left */}
-            <div className="flex-1">
+            <div className="flex items-center">
               <Link to="/" className="inline-flex items-center space-x-2 sm:space-x-3">
                 <img src="/poker-chip.svg" alt="Logo" className="h-7 w-7 sm:h-8 sm:w-8" />
                 <span className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Planning Poker</span>
@@ -31,7 +31,7 @@ export default function Layout() {
             </div>
 
             {/* Desktop Nav - Center */}
-            <nav className="hidden md:flex items-center justify-center flex-1">
+            <nav className="hidden md:flex items-center justify-center">
               <Link
                 to="/"
                 className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
@@ -42,7 +42,7 @@ export default function Layout() {
             </nav>
 
             {/* Desktop User Menu - Right */}
-            <div className="hidden md:flex items-center justify-end space-x-2 flex-1">
+            <div className="hidden md:flex items-center justify-end space-x-2">
               <LanguageSelector />
               <Link
                 to="/profile"

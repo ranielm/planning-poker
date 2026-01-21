@@ -128,22 +128,27 @@ export default function RoomPage() {
               isObserver={isObserver}
               onToggle={toggleRole}
             />
-            <button
-              onClick={copyRoomLink}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white rounded-lg transition-colors"
-            >
-              {copied ? (
-                <>
-                  <Check className="h-4 w-4 text-green-500 dark:text-green-400" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy className="h-4 w-4" />
-                  Copy Link
-                </>
-              )}
-            </button>
+            <div className="flex items-center gap-2 bg-slate-200 dark:bg-slate-700 rounded-lg overflow-hidden">
+              <span className="pl-3 py-2 text-sm font-mono text-slate-600 dark:text-slate-300 select-all">
+                {slug}
+              </span>
+              <button
+                onClick={copyRoomLink}
+                className="flex items-center gap-2 px-3 py-2 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500 text-slate-900 dark:text-white transition-colors"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4 text-green-500 dark:text-green-400" />
+                    <span className="text-sm">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    <span className="text-sm">Copy</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -35,8 +35,12 @@ export default function TopicPanel({
 
     if (!input.trim()) return;
 
-    // Check if it looks like a Jira key/URL
-    const isJiraInput = /^[A-Z]+-\d+$/i.test(input.trim()) || input.includes('atlassian.net');
+    // Check if it looks like a Jira key/URL or numeric-only (issue number)
+    const trimmedInput = input.trim();
+    const isJiraInput =
+      /^[A-Z]+-\d+$/i.test(trimmedInput) || // PROJ-123 format
+      /^\d+$/.test(trimmedInput) || // Numeric only (e.g., 6050)
+      input.includes('atlassian.net'); // Jira URL
 
     if (isJiraInput && isAvailable) {
       const issue = await fetchIssue(input);

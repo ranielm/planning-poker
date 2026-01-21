@@ -19,12 +19,14 @@ export class JiraService {
   private readonly domain: string | undefined;
   private readonly email: string | undefined;
   private readonly apiToken: string | undefined;
+  private readonly defaultProject: string | undefined;
   private readonly isConfigured: boolean;
 
   constructor(private readonly configService: ConfigService) {
     this.domain = this.configService.get<string>('JIRA_DOMAIN');
     this.email = this.configService.get<string>('JIRA_EMAIL');
     this.apiToken = this.configService.get<string>('JIRA_API_TOKEN');
+    this.defaultProject = this.configService.get<string>('JIRA_DEFAULT_PROJECT');
 
     this.isConfigured = !!(this.domain && this.email && this.apiToken);
 
@@ -106,12 +108,21 @@ export class JiraService {
 
   /**
    * Extract issue key from a URL or return the key if already in correct format
+   * Supports: PROJ-123, 123 (with default project), or Jira URLs
    */
   private extractIssueKey(input: string): string | null {
+    const trimmed = input.trim();
+
     // Already a key format (e.g., PROJ-123)
     const keyPattern = /^[A-Z][A-Z0-9_]+-\d+$/i;
-    if (keyPattern.test(input.trim())) {
-      return input.trim().toUpperCase();
+    if (keyPattern.test(trimmed)) {
+      return trimmed.toUpperCase();
+    }
+
+    // Numeric only (e.g., 6050) - prepend default project if configured
+    const numericPattern = /^\d+$/;
+    if (numericPattern.test(trimmed) && this.defaultProject) {
+      return `${this.defaultProject.toUpperCase()}-${trimmed}`;
     }
 
     // Extract from URL

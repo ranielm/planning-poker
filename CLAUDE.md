@@ -449,3 +449,86 @@ The `useEffect` hook for socket event listeners had `[onKicked, navigate]` as de
 
 ### Technical Details:
 When socket events like `room:state` were emitted after a role toggle, the listener was sometimes in the middle of being recreated due to the dependency change, causing the event to be missed or processed incorrectly. Using refs ensures the listeners are stable and only created once.
+
+## Fix: Observer Section Breaking Poker Table Layout
+Date: 2026-01-21
+
+### Overview:
+Fixed a layout bug where having observers in the room caused the poker table to display incorrectly - half green felt, half broken background.
+
+### Problem:
+The Observers section was rendered inside the poker table's wood border container but outside the green felt area, causing the table layout to break.
+
+### Solution:
+- `client/src/components/PokerTable.tsx`:
+  - Wrapped the return in a React Fragment (`<>...</>`)
+  - Moved Observers section completely outside the table div
+  - Observers now displayed in their own styled card below the table
+
+### Summary:
+The poker table felt surface now always remains fully green regardless of observers. Observers are displayed in a separate section below the table with their own styling.
+
+## Room Code Display and Toolbar Centering
+Date: 2026-01-21
+
+### Overview:
+Added room code display near the copy button and fixed toolbar centering issues.
+
+### Changes:
+- `client/src/pages/RoomPage.tsx`:
+  - Added room slug display next to the copy button in a combined UI element
+  - Slug is displayed in monospace font with `select-all` for easy copying
+  - Visual grouping with background color distinguishing slug from copy button
+
+- `client/src/components/Layout.tsx`:
+  - Removed `flex-1` from the three header sections (logo, nav, user menu)
+  - Header now uses `justify-between` properly with natural content widths
+  - Logo and org name properly aligned on the left
+
+### Summary:
+Users can now see the room code directly in the header and the toolbar elements are properly positioned.
+
+## Jira Search by Issue Number
+Date: 2026-01-21
+
+### Overview:
+Added ability to search Jira issues by just the numeric ID (e.g., "6050") instead of requiring the full key (e.g., "VAN-6050").
+
+### Server Changes:
+- `server/src/modules/jira/jira.service.ts`:
+  - Added `JIRA_DEFAULT_PROJECT` environment variable support
+  - Updated `extractIssueKey()` method to handle numeric-only input
+  - When user enters just a number, it prepends the default project prefix
+
+### Client Changes:
+- `client/src/components/TopicPanel.tsx`:
+  - Updated `isJiraInput` regex to recognize numeric-only input as a potential Jira key
+
+### Environment Variables:
+- `JIRA_DEFAULT_PROJECT`: The default project prefix (e.g., "VAN") to use when searching by number only
+
+### How it works:
+1. User enters "6050" in the topic search
+2. Client recognizes it as a potential Jira input
+3. Server prepends the configured default project: "VAN-6050"
+4. Jira API is queried with the full key
+5. Same issue is returned whether user searches "VAN-6050" or "6050"
+
+## Database Migration: Add defaultRole Column
+Date: 2026-01-21
+
+### Overview:
+The `defaultRole` column was added to the Prisma schema but was missing from the production Turso database, causing OAuth and registration to fail.
+
+### Migration Scripts Created:
+- `server/scripts/migrate-add-default-role.sql`: Raw SQL migration
+- `server/scripts/migrate-add-default-role.js`: Node.js script using @libsql/client
+- `server/scripts/migrate-add-default-role.sh`: Bash script using Turso CLI
+
+### Migration Executed:
+```sql
+ALTER TABLE User ADD COLUMN defaultRole TEXT DEFAULT 'VOTER';
+```
+
+### Summary:
+The migration was executed via Turso HTTP API, adding the `defaultRole` column to the User table. OAuth and user registration now work correctly.
