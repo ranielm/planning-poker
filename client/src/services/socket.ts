@@ -41,7 +41,6 @@ class SocketService {
 
       this.socket.on('connect', () => {
         console.log('Socket connected:', this.socket?.id);
-        this.reconnectAttempts = 0;
         this.isReconnecting = false;
         this.emit('connected', {});
         resolve();
