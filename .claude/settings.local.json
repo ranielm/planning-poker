@@ -28,7 +28,8 @@
       "Bash(node:*)",
       "Bash(npm install:*)",
       "Bash(npm ls:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(yarn format:*)"
     ]
   }
 }
