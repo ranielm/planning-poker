@@ -11,7 +11,6 @@ class SocketService {
   private currentToken: string | null = null;
   private currentRoom: string | null = null;
   private isReconnecting = false;
-  private reconnectAttempts = 0;
   private maxReconnectAttempts = 10;
   private reconnectDelay = 1000;
 
@@ -77,7 +76,6 @@ class SocketService {
 
       this.socket.on('reconnect_attempt', (attemptNumber) => {
         console.log('Reconnection attempt:', attemptNumber);
-        this.reconnectAttempts = attemptNumber;
         this.emit('reconnecting', { attempt: attemptNumber, max: this.maxReconnectAttempts });
       });
 
@@ -201,7 +199,6 @@ class SocketService {
     this.currentRoom = null;
     this.currentToken = null;
     this.isReconnecting = false;
-    this.reconnectAttempts = 0;
 
     if (this.socket) {
       this.socket.removeAllListeners();
