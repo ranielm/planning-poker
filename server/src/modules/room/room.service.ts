@@ -126,17 +126,57 @@ export class RoomService {
   }
 
   async delete(roomId: string, userId: string) {
+    console.log('[DELETE ROOM SERVICE] Starting delete:', { roomId, userId });
+
     const room = await this.findById(roomId);
+    console.log('[DELETE ROOM SERVICE] Room found:', {
+      id: room.id,
+      name: room.name,
+      moderatorId: room.moderatorId,
+      participantCount: room.participants?.length
+    });
 
     if (room.moderatorId !== userId) {
+      console.log('[DELETE ROOM SERVICE] Permission denied - user is not moderator');
+      console.log('[DELETE ROOM SERVICE] moderatorId:', room.moderatorId, '!== userId:', userId);
       throw new ForbiddenException('Only the moderator can delete the room');
     }
 
-    await this.prisma.room.delete({
-      where: { id: roomId },
-    });
+    console.log('[DELETE ROOM SERVICE] Permission OK, attempting to delete from database...');
 
-    return { success: true };
+    try {
+      // First delete related records (in order due to foreign key constraints)
+      console.log('[DELETE ROOM SERVICE] Deleting votes...');
+      const votesDeleted = await this.prisma.vote.deleteMany({
+        where: { roomId },
+      });
+      console.log('[DELETE ROOM SERVICE] Votes deleted:', votesDeleted.count);
+
+      console.log('[DELETE ROOM SERVICE] Deleting rounds...');
+      const roundsDeleted = await this.prisma.round.deleteMany({
+        where: { roomId },
+      });
+      console.log('[DELETE ROOM SERVICE] Rounds deleted:', roundsDeleted.count);
+
+      console.log('[DELETE ROOM SERVICE] Deleting participants...');
+      const participantsDeleted = await this.prisma.participant.deleteMany({
+        where: { roomId },
+      });
+      console.log('[DELETE ROOM SERVICE] Participants deleted:', participantsDeleted.count);
+
+      console.log('[DELETE ROOM SERVICE] Deleting room...');
+      await this.prisma.room.delete({
+        where: { id: roomId },
+      });
+      console.log('[DELETE ROOM SERVICE] Room deleted successfully');
+
+      return { success: true };
+    } catch (error) {
+      console.error('[DELETE ROOM SERVICE] Database error:', error);
+      console.error('[DELETE ROOM SERVICE] Error code:', error.code);
+      console.error('[DELETE ROOM SERVICE] Error message:', error.message);
+      throw error;
+    }
   }
 
   async joinRoom(roomId: string, oderId: string, role: string = ParticipantRole.VOTER) {

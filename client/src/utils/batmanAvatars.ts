@@ -7,68 +7,69 @@ export interface BatmanCharacter {
   color: string;
 }
 
-// Dark Knight character avatars using DiceBear API with character-themed seeds
-// Each character gets a unique, deterministic avatar based on their name
-// The avatars are reliably hosted and always available
+// Inline SVG avatars as data URLs to avoid CORS/external dependency issues
+// Simple, stylized character icons
+const createAvatarSvg = (bgColor: string, fgColor: string, initials: string, features?: string): string => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <rect width="100" height="100" fill="${bgColor}"/>
+    <circle cx="50" cy="40" r="25" fill="${fgColor}"/>
+    <circle cx="50" cy="100" r="35" fill="${fgColor}"/>
+    ${features || ''}
+    <text x="50" y="48" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="${bgColor}" text-anchor="middle">${initials}</text>
+  </svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+};
+
+// Dark Knight character avatars using inline SVGs
 export const BATMAN_CHARACTERS: BatmanCharacter[] = [
   {
     name: 'Batman',
-    // Dark hero avatar
-    image: 'https://api.dicebear.com/9.x/avataaars/svg?seed=BatmanBruceWayne&backgroundColor=1a1a2e&accessories=blank&clothing=blazerAndShirt&clothingColor=262e33&eyebrows=defaultNatural&eyes=default&facialHair=blank&hairColor=2c1b18&mouth=serious&skinColor=d08b5b&top=shortHairShortFlat',
+    image: createAvatarSvg('#1a1a2e', '#3d3d5c', 'BM', '<path d="M35 25 L50 15 L65 25" stroke="#1a1a2e" stroke-width="3" fill="none"/>'),
     color: '#1a1a2e',
   },
   {
     name: 'Joker',
-    // Chaotic villain avatar with green hair
-    image: 'https://api.dicebear.com/9.x/avataaars/svg?seed=JokerHeathLedger&backgroundColor=4a0e4e&accessories=blank&clothing=blazerAndShirt&clothingColor=614b8f&eyebrows=raisedExcitedNatural&eyes=happy&facialHair=blank&hairColor=4a8f4d&mouth=twinkle&skinColor=ffdbb4&top=shortHairShortCurly',
+    image: createAvatarSvg('#4a0e4e', '#7fff7f', 'JK', '<path d="M35 50 Q50 60 65 50" stroke="#4a0e4e" stroke-width="2" fill="none"/>'),
     color: '#4a0e4e',
   },
   {
     name: 'Two-Face',
-    // Harvey Dent avatar
-    image: 'https://api.dicebear.com/9.x/avataaars/svg?seed=TwoFaceHarveyDent&backgroundColor=2d4a3e&accessories=blank&clothing=blazerAndSweater&clothingColor=3c4f5c&eyebrows=angryNatural&eyes=squint&facialHair=blank&hairColor=2c1b18&mouth=grimace&skinColor=d08b5b&top=shortHairShortWaved',
+    image: createAvatarSvg('#2d4a3e', '#8fbc8f', 'TF', '<line x1="50" y1="15" x2="50" y2="65" stroke="#2d4a3e" stroke-width="2"/>'),
     color: '#2d4a3e',
   },
   {
     name: 'Bane',
-    // Muscular villain avatar
-    image: 'https://api.dicebear.com/9.x/avataaars/svg?seed=BaneTomHardy&backgroundColor=3d2914&accessories=blank&clothing=hoodie&clothingColor=3c4f5c&eyebrows=angryNatural&eyes=serious&facialHair=blank&hairColor=4a312c&mouth=serious&skinColor=ae5d29&top=shortHairShortFlat',
+    image: createAvatarSvg('#3d2914', '#8b7355', 'BN', '<path d="M35 45 L65 45 M40 50 L60 50" stroke="#3d2914" stroke-width="2"/>'),
     color: '#3d2914',
   },
   {
     name: 'Catwoman',
-    // Selina Kyle avatar
-    image: 'https://api.dicebear.com/9.x/avataaars/svg?seed=CatwomanSelinaKyle&backgroundColor=1a1a1a&accessories=blank&clothing=blazerAndShirt&clothingColor=262e33&eyebrows=defaultNatural&eyes=winkWacky&facialHair=blank&hairColor=2c1b18&mouth=default&skinColor=ffdbb4&top=longHairStraight2',
+    image: createAvatarSvg('#1a1a1a', '#9370db', 'CW', '<path d="M30 25 L40 15 M70 25 L60 15" stroke="#9370db" stroke-width="3"/>'),
     color: '#1a1a1a',
   },
   {
     name: 'Scarecrow',
-    // Dr. Jonathan Crane avatar
-    image: 'https://api.dicebear.com/9.x/avataaars/svg?seed=ScarecrowJonathanCrane&backgroundColor=4a3728&accessories=prescription02&clothing=blazerAndShirt&clothingColor=3c4f5c&eyebrows=flatNatural&eyes=surprised&facialHair=blank&hairColor=4a312c&mouth=concerned&skinColor=edb98a&top=shortHairShortWaved',
+    image: createAvatarSvg('#4a3728', '#d2b48c', 'SC', '<circle cx="42" cy="38" r="5" fill="#4a3728"/><circle cx="58" cy="38" r="5" fill="#4a3728"/>'),
     color: '#4a3728',
   },
   {
     name: "Ra's al Ghul",
-    // Liam Neeson's character avatar
-    image: 'https://api.dicebear.com/9.x/avataaars/svg?seed=RasAlGhulLiamNeeson&backgroundColor=1e3a2f&accessories=blank&clothing=blazerAndSweater&clothingColor=3c4f5c&eyebrows=defaultNatural&eyes=default&facialHair=beardMajestic&facialHairColor=4a312c&hairColor=4a312c&mouth=serious&skinColor=d08b5b&top=shortHairShortWaved',
+    image: createAvatarSvg('#1e3a2f', '#90ee90', 'RG', '<path d="M40 55 L50 60 L60 55" stroke="#1e3a2f" stroke-width="2" fill="none"/>'),
     color: '#1e3a2f',
   },
   {
     name: 'Alfred',
-    // Michael Caine's butler avatar
-    image: 'https://api.dicebear.com/9.x/avataaars/svg?seed=AlfredPennyworth&backgroundColor=2c3e50&accessories=blank&clothing=blazerAndSweater&clothingColor=3c4f5c&eyebrows=defaultNatural&eyes=default&facialHair=blank&hairColor=c0c0c0&mouth=smile&skinColor=ffdbb4&top=shortHairSides',
+    image: createAvatarSvg('#2c3e50', '#c0c0c0', 'AL', '<path d="M35 52 Q50 58 65 52" stroke="#2c3e50" stroke-width="2" fill="none"/>'),
     color: '#2c3e50',
   },
   {
     name: 'Commissioner Gordon',
-    // Gary Oldman's character avatar
-    image: 'https://api.dicebear.com/9.x/avataaars/svg?seed=GordonGCPD&backgroundColor=34495e&accessories=prescription01&clothing=blazerAndShirt&clothingColor=3c4f5c&eyebrows=defaultNatural&eyes=default&facialHair=beardMedium&facialHairColor=4a312c&hairColor=4a312c&mouth=serious&skinColor=edb98a&top=shortHairShortWaved',
+    image: createAvatarSvg('#34495e', '#f4a460', 'CG', '<rect x="38" y="35" width="24" height="8" rx="2" fill="none" stroke="#34495e" stroke-width="2"/>'),
     color: '#34495e',
   },
   {
     name: 'Lucius Fox',
-    // Morgan Freeman's character avatar
-    image: 'https://api.dicebear.com/9.x/avataaars/svg?seed=LuciusFoxWayneEnterprises&backgroundColor=1a252f&accessories=prescription02&clothing=blazerAndSweater&clothingColor=3c4f5c&eyebrows=defaultNatural&eyes=default&facialHair=blank&hairColor=2c1b18&mouth=smile&skinColor=614335&top=shortHairSides',
+    image: createAvatarSvg('#1a252f', '#4682b4', 'LF', '<rect x="38" y="35" width="24" height="8" rx="2" fill="none" stroke="#1a252f" stroke-width="2"/>'),
     color: '#1a252f',
   },
 ];

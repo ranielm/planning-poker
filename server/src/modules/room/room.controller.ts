@@ -87,18 +87,39 @@ export class RoomController {
     @Param('id') id: string,
     @CurrentUser('id') userId: string,
   ) {
-    // Get room info before deleting to check if it was public
-    const room = await this.roomService.findById(id);
-    const wasPublic = room.isPublic;
+    console.log('[DELETE ROOM] Controller received request:', { roomId: id, userId });
 
-    const result = await this.roomService.delete(id, userId);
+    try {
+      // Get room info before deleting to check if it was public
+      console.log('[DELETE ROOM] Fetching room info...');
+      const room = await this.roomService.findById(id);
+      console.log('[DELETE ROOM] Room found:', {
+        roomId: room.id,
+        roomName: room.name,
+        moderatorId: room.moderatorId,
+        isPublic: room.isPublic
+      });
 
-    // Notify all clients about deleted public room
-    if (wasPublic) {
-      this.gameGateway.server.emit('publicRoom:deleted', { roomId: id });
+      const wasPublic = room.isPublic;
+
+      console.log('[DELETE ROOM] Calling roomService.delete...');
+      const result = await this.roomService.delete(id, userId);
+      console.log('[DELETE ROOM] Delete result:', result);
+
+      // Notify all clients about deleted public room
+      if (wasPublic) {
+        console.log('[DELETE ROOM] Emitting publicRoom:deleted event');
+        this.gameGateway.server.emit('publicRoom:deleted', { roomId: id });
+      }
+
+      console.log('[DELETE ROOM] Success, returning result');
+      return result;
+    } catch (error) {
+      console.error('[DELETE ROOM] Error:', error);
+      console.error('[DELETE ROOM] Error message:', error.message);
+      console.error('[DELETE ROOM] Error stack:', error.stack);
+      throw error;
     }
-
-    return result;
   }
 
   @Post(':id/join')
