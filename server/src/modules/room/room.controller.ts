@@ -13,11 +13,15 @@ import { RoomService } from './room.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateRoomDto, UpdateRoomDto, JoinRoomDto } from './dto/room.dto';
+import { GameGateway } from '../../gateway/game.gateway';
 
 @ApiTags('rooms')
 @Controller('rooms')
 export class RoomController {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(
+    private readonly roomService: RoomService,
+    private readonly gameGateway: GameGateway,
+  ) {}
 
   @Get('public')
   @ApiOperation({ summary: 'Get all public rooms' })
@@ -35,7 +39,22 @@ export class RoomController {
     @CurrentUser('id') userId: string,
     @Body() dto: CreateRoomDto,
   ) {
-    return this.roomService.create(userId, dto);
+    const room = await this.roomService.create(userId, dto);
+
+    // Notify all clients about new public room
+    if (room.isPublic) {
+      this.gameGateway.server.emit('publicRoom:created', {
+        id: room.id,
+        name: room.name,
+        slug: room.slug,
+        deckType: room.deckType,
+        createdAt: room.createdAt,
+        moderator: room.moderator,
+        _count: { participants: room.participants.length },
+      });
+    }
+
+    return room;
   }
 
   @Get(':slug')
@@ -68,7 +87,18 @@ export class RoomController {
     @Param('id') id: string,
     @CurrentUser('id') userId: string,
   ) {
-    return this.roomService.delete(id, userId);
+    // Get room info before deleting to check if it was public
+    const room = await this.roomService.findById(id);
+    const wasPublic = room.isPublic;
+
+    const result = await this.roomService.delete(id, userId);
+
+    // Notify all clients about deleted public room
+    if (wasPublic) {
+      this.gameGateway.server.emit('publicRoom:deleted', { roomId: id });
+    }
+
+    return result;
   }
 
   @Post(':id/join')

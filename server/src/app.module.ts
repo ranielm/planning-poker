@@ -7,7 +7,7 @@ import { RoomModule } from './modules/room/room.module';
 import { GameModule } from './modules/game/game.module';
 import { JiraModule } from './modules/jira/jira.module';
 import { HealthModule } from './modules/health/health.module';
-import { GameGateway } from './gateway/game.gateway';
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { GameGateway } from './gateway/game.gateway';
     GameModule,
     JiraModule,
     HealthModule,
+    GatewayModule,
   ],
-  providers: [GameGateway],
 })
 export class AppModule {}

@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
+import { socketService } from '../services/socket';
+import { useAuthStore } from '../store/authStore';
 import { Room } from '../types';
-import { Users, Clock, ChevronRight, Loader2, Globe, Lock, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
+import { Users, Clock, ChevronRight, Loader2, Globe, Lock, Plus, Search, Trash2 } from 'lucide-react';
 import { useI18n } from '../i18n';
 
 interface PublicRoom {
@@ -23,6 +25,7 @@ interface PublicRoom {
 
 export default function HomePage() {
   const { t, language } = useI18n();
+  const { token } = useAuthStore();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [publicRooms, setPublicRooms] = useState<PublicRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,6 +59,42 @@ export default function HomePage() {
     fetchRooms();
     fetchPublicRooms();
   }, [fetchPublicRooms]);
+
+  // Socket connection for real-time public room updates
+  useEffect(() => {
+    if (!token) return;
+
+    // Connect to socket if not already connected
+    const connectSocket = async () => {
+      if (!socketService.isConnected()) {
+        try {
+          await socketService.connect(token);
+        } catch (error) {
+          console.error('Failed to connect socket for public room updates:', error);
+        }
+      }
+    };
+
+    connectSocket();
+
+    // Listen for public room events
+    const unsubCreated = socketService.on<PublicRoom>('publicRoom:created', (newRoom) => {
+      setPublicRooms((prev) => {
+        // Avoid duplicates
+        if (prev.some(r => r.id === newRoom.id)) return prev;
+        return [newRoom, ...prev];
+      });
+    });
+
+    const unsubDeleted = socketService.on<{ roomId: string }>('publicRoom:deleted', ({ roomId }) => {
+      setPublicRooms((prev) => prev.filter((r) => r.id !== roomId));
+    });
+
+    return () => {
+      unsubCreated();
+      unsubDeleted();
+    };
+  }, [token]);
 
   const handleDeleteRoom = async (roomId: string, roomName: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -234,19 +273,9 @@ export default function HomePage() {
 
         {/* Public Rooms */}
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Globe className="h-5 w-5 text-green-500 dark:text-green-400" />
-              <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">{t.home.publicRooms}</h2>
-            </div>
-            <button
-              onClick={() => fetchPublicRooms()}
-              disabled={isLoadingPublic}
-              className="p-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg transition-colors disabled:opacity-50"
-              title="Refresh"
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoadingPublic ? 'animate-spin' : ''}`} />
-            </button>
+          <div className="flex items-center gap-2">
+            <Globe className="h-5 w-5 text-green-500 dark:text-green-400" />
+            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">{t.home.publicRooms}</h2>
           </div>
 
           <div className="flex-1">

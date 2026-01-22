@@ -132,6 +132,15 @@ class SocketService {
       this.socket.on('game:brbStatusChanged', (data) => {
         this.emit('game:brbStatusChanged', data);
       });
+
+      // Public room events (for homepage real-time updates)
+      this.socket.on('publicRoom:created', (data) => {
+        this.emit('publicRoom:created', data);
+      });
+
+      this.socket.on('publicRoom:deleted', (data) => {
+        this.emit('publicRoom:deleted', data);
+      });
     });
   }
 
