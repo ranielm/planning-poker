@@ -1,6 +1,7 @@
 import { clsx } from 'clsx';
-import { User, Crown, Eye, Check, UserCog } from 'lucide-react';
+import { Crown, Eye, Check, UserCog, UserX } from 'lucide-react';
 import { Participant, ParticipantRole } from '../types';
+import { getAvatarUrl, getAvatarName } from '../utils/batmanAvatars';
 
 interface ParticipantCardProps {
   participant: Participant;
@@ -11,6 +12,7 @@ interface ParticipantCardProps {
   isDealer?: boolean;
   isModeratorView?: boolean;
   onAssignDealer?: (userId: string) => void;
+  onKick?: (userId: string) => void;
 }
 
 // No face card mapping - show actual numbers
@@ -45,6 +47,7 @@ export default function ParticipantCard({
   isDealer,
   isModeratorView,
   onAssignDealer,
+  onKick,
 }: ParticipantCardProps) {
   const roleIcons: Record<ParticipantRole, React.ReactNode> = {
     MODERATOR: <Crown className="h-3 w-3 text-yellow-400" />,
@@ -153,17 +156,11 @@ export default function ParticipantCard({
 
       {/* Avatar */}
       <div className="relative">
-        {participant.avatarUrl ? (
-          <img
-            src={participant.avatarUrl}
-            alt={participant.displayName}
-            className="h-8 w-8 rounded-full border-2 border-slate-600 shadow"
-          />
-        ) : (
-          <div className="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center border-2 border-slate-600 shadow">
-            <User className="h-4 w-4 text-slate-400" />
-          </div>
-        )}
+        <img
+          src={getAvatarUrl(participant.avatarUrl, participant.userId)}
+          alt={participant.avatarUrl ? participant.displayName : getAvatarName(participant.userId)}
+          className="h-8 w-8 rounded-full border-2 border-slate-600 shadow object-cover"
+        />
         {roleIcons[participant.role] && (
           <div className="absolute -top-1 -right-1 bg-slate-800 rounded-full p-0.5 shadow">
             {roleIcons[participant.role]}
@@ -179,19 +176,40 @@ export default function ParticipantCard({
         )}
       </div>
 
-      {isModeratorView && !isDealer && !isCurrentUser && onAssignDealer && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            if (confirm(`Assign Dealer role to ${participant.displayName}?`)) {
-              onAssignDealer(participant.userId);
-            }
-          }}
-          className="absolute -right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 bg-indigo-600 text-white rounded-full shadow-lg hover:scale-110 transition-all z-20"
-          title="Assign Dealer"
-        >
-          <UserCog className="h-3 w-3" />
-        </button>
+      {/* Moderator actions */}
+      {isModeratorView && !isCurrentUser && (
+        <div className="absolute -right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex flex-col gap-1 z-20">
+          {/* Assign Dealer button */}
+          {!isDealer && onAssignDealer && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm(`Assign Dealer role to ${participant.displayName}?`)) {
+                  onAssignDealer(participant.userId);
+                }
+              }}
+              className="p-1.5 bg-indigo-600 text-white rounded-full shadow-lg hover:scale-110 hover:bg-indigo-500 transition-all"
+              title="Assign Dealer"
+            >
+              <UserCog className="h-3 w-3" />
+            </button>
+          )}
+          {/* Kick button - only for non-moderators */}
+          {participant.role !== 'MODERATOR' && onKick && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm(`Remove ${participant.displayName} from the room?`)) {
+                  onKick(participant.userId);
+                }
+              }}
+              className="p-1.5 bg-red-600 text-white rounded-full shadow-lg hover:scale-110 hover:bg-red-500 transition-all"
+              title="Remove from room"
+            >
+              <UserX className="h-3 w-3" />
+            </button>
+          )}
+        </div>
       )}
 
       {/* Name */}

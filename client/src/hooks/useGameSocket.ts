@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { socketService } from '../services/socket';
 import { useAuthStore } from '../store/authStore';
@@ -26,21 +26,33 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     reset,
   } = useGameStore();
 
+  const [isReconnecting, setIsReconnecting] = useState(false);
+  const [reconnectAttempt, setReconnectAttempt] = useState(0);
+
   const hasConnected = useRef(false);
   const onKickedRef = useRef(onKicked);
   const navigateRef = useRef(navigate);
+  const roomSlugRef = useRef(roomSlug);
+  const tokenRef = useRef(token);
 
   // Keep refs updated
   useEffect(() => {
     onKickedRef.current = onKicked;
     navigateRef.current = navigate;
-  }, [onKicked, navigate]);
+    roomSlugRef.current = roomSlug;
+    tokenRef.current = token;
+  }, [onKicked, navigate, roomSlug, token]);
 
   // Connect and join room
   useEffect(() => {
-    if (!token || !roomSlug || hasConnected.current) return;
+    if (!token || !roomSlug) return;
 
     const connectAndJoin = async () => {
+      // Skip if already connected to this room
+      if (hasConnected.current && socketService.isConnected() && socketService.getCurrentRoom() === roomSlug) {
+        return;
+      }
+
       setJoining(true);
       setError(null);
 
@@ -70,6 +82,80 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     };
   }, [token, roomSlug]);
 
+  // Handle page visibility changes (tab switching)
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible') {
+        console.log('Tab became visible, checking connection...');
+
+        // Small delay to let the browser fully wake up
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        if (!socketService.isConnected() && tokenRef.current && roomSlugRef.current) {
+          console.log('Connection lost, attempting to reconnect...');
+          setIsReconnecting(true);
+
+          try {
+            const success = await socketService.forceReconnect();
+            if (success) {
+              console.log('Reconnected successfully');
+              setConnected(true);
+              setIsReconnecting(false);
+              setReconnectAttempt(0);
+            }
+          } catch (error) {
+            console.error('Reconnection failed:', error);
+            setIsReconnecting(false);
+          }
+        } else if (socketService.isConnected()) {
+          // Already connected, but let's ensure we have fresh state
+          const currentRoom = socketService.getCurrentRoom();
+          if (currentRoom && currentRoom === roomSlugRef.current) {
+            // Request fresh state by rejoining (server will send room:state)
+            try {
+              await socketService.joinRoom(roomSlugRef.current);
+            } catch (error) {
+              console.log('State refresh failed, connection may be stale');
+            }
+          }
+        }
+      }
+    };
+
+    // Handle online/offline events
+    const handleOnline = async () => {
+      console.log('Browser came online, checking connection...');
+      if (!socketService.isConnected() && tokenRef.current) {
+        setIsReconnecting(true);
+        try {
+          const success = await socketService.forceReconnect();
+          if (success) {
+            setConnected(true);
+          }
+        } catch (error) {
+          console.error('Reconnection on online failed:', error);
+        } finally {
+          setIsReconnecting(false);
+        }
+      }
+    };
+
+    const handleOffline = () => {
+      console.log('Browser went offline');
+      setConnected(false);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [setConnected]);
+
   // Subscribe to socket events (runs once on mount)
   useEffect(() => {
     const unsubscribers: (() => void)[] = [];
@@ -77,6 +163,8 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     unsubscribers.push(
       socketService.on<GameState>('room:state', (state) => {
         setGameState(state);
+        setIsReconnecting(false);
+        setReconnectAttempt(0);
       })
     );
 
@@ -91,6 +179,36 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     unsubscribers.push(
       socketService.on('disconnected', () => {
         setConnected(false);
+      })
+    );
+
+    unsubscribers.push(
+      socketService.on('connected', () => {
+        setConnected(true);
+        setIsReconnecting(false);
+      })
+    );
+
+    unsubscribers.push(
+      socketService.on('reconnected', () => {
+        setConnected(true);
+        setIsReconnecting(false);
+        setReconnectAttempt(0);
+      })
+    );
+
+    unsubscribers.push(
+      socketService.on<{ attempt: number; max: number }>('reconnecting', ({ attempt, max }) => {
+        setIsReconnecting(true);
+        setReconnectAttempt(attempt);
+        console.log(`Reconnecting... attempt ${attempt}/${max}`);
+      })
+    );
+
+    unsubscribers.push(
+      socketService.on('reconnect_failed', () => {
+        setIsReconnecting(false);
+        setError('Connection lost. Please refresh the page.');
       })
     );
 
@@ -249,6 +367,8 @@ export function useGameSocket({ roomSlug, onKicked }: UseGameSocketOptions) {
     gameState,
     isConnected,
     isJoining,
+    isReconnecting,
+    reconnectAttempt,
     selectedCard,
     deck,
     isModerator,

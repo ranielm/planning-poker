@@ -8,35 +8,82 @@ type EventCallback<T = unknown> = (data: T) => void;
 class SocketService {
   private socket: Socket | null = null;
   private listeners: Map<string, Set<EventCallback>> = new Map();
+  private currentToken: string | null = null;
+  private currentRoom: string | null = null;
+  private isReconnecting = false;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 10;
+  private reconnectDelay = 1000;
 
   connect(token: string): Promise<void> {
     return new Promise((resolve, reject) => {
+      this.currentToken = token;
+
       if (this.socket?.connected) {
         resolve();
         return;
+      }
+
+      // Clean up existing socket if any
+      if (this.socket) {
+        this.socket.removeAllListeners();
+        this.socket.disconnect();
       }
 
       this.socket = io(`${SOCKET_URL}/game`, {
         auth: { token },
         transports: ['websocket', 'polling'],
         reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
+        reconnectionAttempts: this.maxReconnectAttempts,
+        reconnectionDelay: this.reconnectDelay,
+        reconnectionDelayMax: 5000,
+        timeout: 10000,
       });
 
       this.socket.on('connect', () => {
         console.log('Socket connected:', this.socket?.id);
+        this.reconnectAttempts = 0;
+        this.isReconnecting = false;
+        this.emit('connected', {});
         resolve();
       });
 
       this.socket.on('connect_error', (error) => {
         console.error('Socket connection error:', error);
-        reject(error);
+        if (!this.isReconnecting) {
+          reject(error);
+        }
       });
 
       this.socket.on('disconnect', (reason) => {
         console.log('Socket disconnected:', reason);
         this.emit('disconnected', { reason });
+
+        // Auto-reconnect for certain disconnect reasons
+        if (reason === 'io server disconnect' || reason === 'transport close' || reason === 'ping timeout') {
+          this.handleReconnect();
+        }
+      });
+
+      this.socket.on('reconnect', (attemptNumber) => {
+        console.log('Socket reconnected after', attemptNumber, 'attempts');
+        this.emit('reconnected', { attemptNumber });
+
+        // Rejoin room if we were in one
+        if (this.currentRoom) {
+          this.rejoinRoom();
+        }
+      });
+
+      this.socket.on('reconnect_attempt', (attemptNumber) => {
+        console.log('Reconnection attempt:', attemptNumber);
+        this.reconnectAttempts = attemptNumber;
+        this.emit('reconnecting', { attempt: attemptNumber, max: this.maxReconnectAttempts });
+      });
+
+      this.socket.on('reconnect_failed', () => {
+        console.error('Reconnection failed after max attempts');
+        this.emit('reconnect_failed', {});
       });
 
       this.socket.on('error', (error) => {
@@ -91,8 +138,73 @@ class SocketService {
     });
   }
 
+  private handleReconnect(): void {
+    if (this.isReconnecting || !this.currentToken) return;
+
+    this.isReconnecting = true;
+    console.log('Attempting to reconnect...');
+
+    // Socket.io will handle automatic reconnection
+    // We just need to ensure we rejoin the room after reconnect
+  }
+
+  private async rejoinRoom(): Promise<void> {
+    if (!this.currentRoom) return;
+
+    try {
+      console.log('Rejoining room:', this.currentRoom);
+      const result = await this.joinRoom(this.currentRoom);
+      console.log('Rejoined room successfully:', result);
+    } catch (error) {
+      console.error('Failed to rejoin room:', error);
+      this.emit('error', { message: 'Failed to rejoin room after reconnection' });
+    }
+  }
+
+  // Force reconnect (useful when tab becomes visible again)
+  async forceReconnect(): Promise<boolean> {
+    if (!this.currentToken) return false;
+
+    console.log('Force reconnect requested');
+
+    // If already connected, just rejoin the room
+    if (this.socket?.connected) {
+      if (this.currentRoom) {
+        await this.rejoinRoom();
+      }
+      return true;
+    }
+
+    // Otherwise, reconnect
+    try {
+      await this.connect(this.currentToken);
+      if (this.currentRoom) {
+        await this.rejoinRoom();
+      }
+      return true;
+    } catch (error) {
+      console.error('Force reconnect failed:', error);
+      return false;
+    }
+  }
+
+  // Check connection health
+  checkConnection(): boolean {
+    return this.socket?.connected || false;
+  }
+
+  getCurrentRoom(): string | null {
+    return this.currentRoom;
+  }
+
   disconnect(): void {
+    this.currentRoom = null;
+    this.currentToken = null;
+    this.isReconnecting = false;
+    this.reconnectAttempts = 0;
+
     if (this.socket) {
+      this.socket.removeAllListeners();
       this.socket.disconnect();
       this.socket = null;
     }
@@ -105,10 +217,12 @@ class SocketService {
 
   // Room actions
   joinRoom(roomSlug: string, role?: ParticipantRole): Promise<{ success: boolean; roomId: string }> {
+    this.currentRoom = roomSlug;
     return this.emitWithAck('room:join', { roomSlug, role });
   }
 
   leaveRoom(): Promise<{ success: boolean }> {
+    this.currentRoom = null;
     return this.emitWithAck('room:leave', {});
   }
 

@@ -28,21 +28,21 @@ export default function RoleToggle({ isObserver, onToggle }: RoleToggleProps) {
       className={clsx(
         'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border',
         isObserver
-          ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20'
-          : 'bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20',
+          ? 'bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20'
+          : 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20',
         isToggling && 'opacity-50 cursor-wait'
       )}
-      title={isObserver ? 'Click to become a Voter' : 'Click to become an Observer'}
+      title={isObserver ? 'Currently observing' : 'Currently voting'}
     >
       {isObserver ? (
         <>
-          <Eye className="h-4 w-4" />
-          <span>Observer</span>
+          <User className="h-4 w-4" />
+          <span>Switch to Voter</span>
         </>
       ) : (
         <>
-          <User className="h-4 w-4" />
-          <span>Voter</span>
+          <Eye className="h-4 w-4" />
+          <span>Switch to Observer</span>
         </>
       )}
     </button>

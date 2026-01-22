@@ -598,3 +598,129 @@ Restored the poker table felt minimum height back to the original 280px.
 
 ### Summary:
 The table height was increased to 320px in an earlier fix, but the original 280px is correct now that observers are displayed outside the table.
+
+## Role Toggle UX Fix - Show Action Instead of State
+Date: 2026-01-22
+
+### Overview:
+Fixed the role toggle button to show the action that will happen when clicked, not the current state.
+
+### Changes:
+- `client/src/components/RoleToggle.tsx`:
+  - Button now shows "Switch to Voter" when user is Observer
+  - Button now shows "Switch to Observer" when user is Voter
+  - Icon matches the target role (User icon for Voter action, Eye icon for Observer action)
+  - Tooltip shows current state ("Currently observing" / "Currently voting")
+  - Colors swapped to match the action being taken
+
+### Summary:
+The toggle button now clearly indicates what will happen when clicked, improving UX by following the standard pattern where buttons describe their action.
+
+## Batman Character Avatars
+Date: 2026-01-22
+
+### Overview:
+Added Batman (The Dark Knight trilogy) character avatars as default profile pictures for users without custom avatars.
+
+### Files Created:
+- `client/src/utils/batmanAvatars.ts`: Utility with character list and hash-based selection
+- `client/public/avatars/*.svg`: 10 SVG avatar images for characters
+
+### Characters Available:
+1. Batman - Dark masked vigilante
+2. Joker - Green hair, makeup (matches the "?" card theme!)
+3. Two-Face - Half normal, half scarred
+4. Bane - Iconic mask
+5. Catwoman - Cat ears, green eyes
+6. Scarecrow - Burlap mask
+7. Ra's al Ghul - Serious, bearded
+8. Alfred - Gray hair, elegant butler
+9. Commissioner Gordon - Glasses, mustache
+10. Lucius Fox - Professional appearance
+
+### Files Updated:
+- `client/src/components/ParticipantCard.tsx`: Uses `getAvatarUrl()` for participant avatars
+- `client/src/components/Layout.tsx`: Uses `getAvatarUrl()` for header user avatar
+
+### How it works:
+1. When a user doesn't have a custom avatar, the system selects a Batman character
+2. Character selection is deterministic based on user ID hash (same user = same character)
+3. SVG avatars are stylized representations of each character
+4. Users with custom avatars continue to see their uploaded image
+
+## Automatic Reconnection System
+Date: 2026-01-22
+
+### Overview:
+Implemented automatic WebSocket reconnection when users switch tabs or lose connection, preventing infinite loading states.
+
+### Socket Service Changes (`client/src/services/socket.ts`):
+- Added state tracking: `currentToken`, `currentRoom`, `isReconnecting`, `reconnectAttempts`
+- New method `forceReconnect()`: Forces reconnection and rejoins room
+- New method `getCurrentRoom()`: Returns current room slug
+- Private method `rejoinRoom()`: Automatically rejoins room after reconnect
+- Enhanced Socket.io config: 10 reconnection attempts, progressive delay up to 5s
+- New events emitted: `connected`, `reconnected`, `reconnecting`, `reconnect_failed`
+
+### Hook Changes (`client/src/hooks/useGameSocket.ts`):
+- Added `visibilitychange` listener: Detects when tab becomes visible
+- Added `online`/`offline` listeners: Detects network state changes
+- New states: `isReconnecting`, `reconnectAttempt`
+- When tab becomes visible:
+  - If disconnected: Attempts reconnection
+  - If connected: Refreshes room state by rejoining
+- Maintains game state during reconnection (no blank screen)
+
+### UI Changes (`client/src/pages/RoomPage.tsx`):
+- Added reconnection banner at top of screen
+- Shows "Reconnecting (attempt X)..." with spinner
+- Shows "Connection lost. Reconnecting..." when offline
+- Game state remains visible during reconnection
+
+### How it works:
+1. User switches to another tab → socket may disconnect due to browser throttling
+2. User returns to tab → `visibilitychange` event fires
+3. System checks connection status
+4. If disconnected: Shows banner, attempts reconnection, rejoins room
+5. If connected: Silently refreshes state
+6. Game continues seamlessly without manual refresh
+
+## Moderator Kick Participant Feature
+Date: 2026-01-22
+
+### Overview:
+Moderators can now remove participants from the room directly from the poker table.
+
+### Changes:
+- `client/src/components/ParticipantCard.tsx`:
+  - Added `onKick` prop
+  - Added red kick button (UserX icon) in moderator action buttons
+  - Button appears on hover alongside the assign dealer button
+  - Confirmation dialog before removing participant
+  - Kick button hidden for moderators (can't kick moderators)
+
+- `client/src/components/PokerTable.tsx`:
+  - Added `onKickParticipant` prop
+  - Passes kick function to all ParticipantCard components (voters and observers)
+
+- `client/src/pages/RoomPage.tsx`:
+  - Added `kickParticipant` from useGameSocket
+  - Passes kick function to PokerTable
+
+### How it works:
+1. Moderator hovers over any participant (except themselves)
+2. Action buttons appear to the right of the participant card
+3. Blue button (UserCog) = Assign Dealer
+4. Red button (UserX) = Remove from Room
+5. Clicking kick shows confirmation: "Remove [name] from the room?"
+6. On confirm, participant is kicked and redirected to home page
+7. Moderators cannot be kicked (button doesn't appear for them)
+
+### Moderator Powers Summary:
+Moderators retain all powers even when set to Observer role:
+- Reveal cards
+- Reset round
+- Change deck type
+- Set/change topic
+- Assign dealer
+- Kick participants

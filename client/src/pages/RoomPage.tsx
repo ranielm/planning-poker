@@ -9,7 +9,7 @@ import ModeratorControls from '../components/ModeratorControls';
 import SessionTimer from '../components/SessionTimer';
 import SessionLockOverlay from '../components/SessionLockOverlay';
 import RoleToggle from '../components/RoleToggle';
-import { Loader2, AlertCircle, Copy, Check, ArrowLeft } from 'lucide-react';
+import { Loader2, AlertCircle, Copy, Check, ArrowLeft, WifiOff, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { CardValue } from '../types';
 
@@ -23,6 +23,8 @@ export default function RoomPage() {
     gameState,
     isConnected,
     isJoining,
+    isReconnecting,
+    reconnectAttempt,
     selectedCard,
     deck,
     isModerator,
@@ -39,6 +41,7 @@ export default function RoomPage() {
     setBrb,
     assignDealer,
     toggleRole,
+    kickParticipant,
   } = useGameSocket({
     roomSlug: slug || '',
     onKicked: () => navigate('/'),
@@ -58,8 +61,8 @@ export default function RoomPage() {
     }
   };
 
-  // Loading state
-  if (isJoining || !isConnected) {
+  // Loading state - but show existing game state if reconnecting
+  if ((isJoining || !isConnected) && !gameState) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="text-center">
@@ -104,6 +107,27 @@ export default function RoomPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] p-2 sm:p-4 lg:p-6 xl:p-8 relative">
+      {/* Reconnection Banner */}
+      {(isReconnecting || !isConnected) && gameState && (
+        <div className="fixed top-16 left-0 right-0 z-50 flex justify-center">
+          <div className="mx-4 px-4 py-2 bg-amber-500/90 dark:bg-amber-600/90 text-white rounded-lg shadow-lg flex items-center gap-3 animate-pulse">
+            {isReconnecting ? (
+              <>
+                <RefreshCw className="h-4 w-4 animate-spin" />
+                <span className="text-sm font-medium">
+                  Reconnecting{reconnectAttempt > 0 ? ` (attempt ${reconnectAttempt})` : ''}...
+                </span>
+              </>
+            ) : (
+              <>
+                <WifiOff className="h-4 w-4" />
+                <span className="text-sm font-medium">Connection lost. Reconnecting...</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Session Lock Overlay */}
       {isBrb && (
         <SessionLockOverlay onUnlock={() => setBrb(false)} />
@@ -180,6 +204,7 @@ export default function RoomPage() {
             isModerator={isModerator}
             dealerId={gameState.dealerId}
             onAssignDealer={assignDealer}
+            onKickParticipant={kickParticipant}
           />
         </div>
 

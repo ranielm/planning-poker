@@ -10,9 +10,10 @@ interface PokerTableProps {
   isModerator?: boolean;
   dealerId?: string | null;
   onAssignDealer?: (userId: string) => void;
+  onKickParticipant?: (userId: string) => void;
 }
 
-export default function PokerTable({ participants, votes, phase, deckType = 'FIBONACCI', isModerator, dealerId, onAssignDealer }: PokerTableProps) {
+export default function PokerTable({ participants, votes, phase, deckType = 'FIBONACCI', isModerator, dealerId, onAssignDealer, onKickParticipant }: PokerTableProps) {
   const { user } = useAuthStore();
   const isRevealed = phase === 'REVEALED';
 
@@ -73,6 +74,7 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
                   isDealer={participant.userId === dealerId}
                   isModeratorView={isModerator}
                   onAssignDealer={onAssignDealer}
+                  onKick={onKickParticipant}
                 />
               ))}
             </div>
@@ -139,6 +141,7 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
                   isDealer={participant.userId === dealerId}
                   isModeratorView={isModerator}
                   onAssignDealer={onAssignDealer}
+                  onKick={onKickParticipant}
                 />
               ))}
             </div>
@@ -163,6 +166,8 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
                 vote={null}
                 isRevealed={false}
                 isCurrentUser={participant.userId === user?.id}
+                isModeratorView={isModerator}
+                onKick={onKickParticipant}
               />
             ))}
           </div>
