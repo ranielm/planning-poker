@@ -25,7 +25,7 @@ interface PublicRoom {
 
 export default function HomePage() {
   const { t, language } = useI18n();
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [publicRooms, setPublicRooms] = useState<PublicRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -229,18 +229,20 @@ export default function HomePage() {
                         </div>
                       </Link>
                       <div className="flex items-center gap-2 shrink-0">
-                        <button
-                          onClick={(e) => handleDeleteRoom(room.id, room.name, e)}
-                          disabled={deletingRoomId === room.id}
-                          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
-                          title="Delete room"
-                        >
-                          {deletingRoomId === room.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                        </button>
+                        {user && room.moderatorId === user.id && (
+                          <button
+                            onClick={(e) => handleDeleteRoom(room.id, room.name, e)}
+                            disabled={deletingRoomId === room.id}
+                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
+                            title="Delete room"
+                          >
+                            {deletingRoomId === room.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </button>
+                        )}
                         <Link
                           to={`/poker/${room.slug}`}
                           className="p-1.5 text-slate-400 hover:text-primary-500 hover:bg-primary-500/10 rounded-lg transition-colors"

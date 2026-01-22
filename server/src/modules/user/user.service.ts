@@ -56,6 +56,17 @@ export class UserService {
       },
       orderBy: { updatedAt: 'desc' },
       take: 20,
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        deckType: true,
+        isPublic: true,
+        isActive: true,
+        moderatorId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 }
