@@ -1,12 +1,58 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="50" fill="#1a252f"/>
-  <ellipse cx="50" cy="55" rx="28" ry="32" fill="#8b6b4a"/>
-  <path d="M30 30 Q40 25 50 28 Q60 25 70 30 Q72 20 65 18 Q55 15 50 18 Q45 15 35 18 Q28 20 30 30" fill="#2a2a2a"/>
-  <ellipse cx="38" cy="50" rx="5" ry="4" fill="#2a2a2a"/>
-  <ellipse cx="62" cy="50" rx="5" ry="4" fill="#2a2a2a"/>
-  <circle cx="38" cy="50" r="2" fill="#1a1a1a"/>
-  <circle cx="62" cy="50" r="2" fill="#1a1a1a"/>
-  <path d="M42 72 Q50 78 58 72" fill="#6a4a3a"/>
-  <path d="M30 43 L38 46 M70 43 L62 46" stroke="#2a2a2a" stroke-width="2"/>
-  <ellipse cx="50" cy="62" rx="8" ry="4" fill="#7a5a4a"/>
+  <defs>
+    <linearGradient id="luciusBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a252f"/>
+      <stop offset="100%" style="stop-color:#0a1520"/>
+    </linearGradient>
+    <linearGradient id="luciusSkin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b6b4a"/>
+      <stop offset="100%" style="stop-color:#6a5038"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <circle cx="50" cy="50" r="50" fill="url(#luciusBg)"/>
+  <!-- Hair - short, graying -->
+  <ellipse cx="50" cy="30" rx="26" ry="18" fill="#3a3a3a"/>
+  <path d="M26 34 Q38 22 50 26 Q62 22 74 34 L70 42 L30 42 Z" fill="#2a2a2a"/>
+  <!-- Gray hair highlights -->
+  <path d="M35 28 Q40 24 45 28" fill="none" stroke="#6a6a6a" stroke-width="1.5"/>
+  <path d="M55 28 Q60 24 65 28" fill="none" stroke="#6a6a6a" stroke-width="1.5"/>
+  <!-- Face -->
+  <ellipse cx="50" cy="56" rx="26" ry="32" fill="url(#luciusSkin)"/>
+  <!-- Forehead highlight -->
+  <ellipse cx="50" cy="42" rx="15" ry="8" fill="#9a7a58" opacity="0.3"/>
+  <!-- Eyes - intelligent, warm -->
+  <ellipse cx="38" cy="52" rx="6" ry="4" fill="#f8f0e8"/>
+  <ellipse cx="62" cy="52" rx="6" ry="4" fill="#f8f0e8"/>
+  <circle cx="38" cy="52" r="2.5" fill="#3a2a1a"/>
+  <circle cx="62" cy="52" r="2.5" fill="#3a2a1a"/>
+  <circle cx="38" cy="52" r="1.5" fill="#1a1a1a"/>
+  <circle cx="62" cy="52" r="1.5" fill="#1a1a1a"/>
+  <circle cx="37" cy="51" r="0.8" fill="#fff"/>
+  <circle cx="61" cy="51" r="0.8" fill="#fff"/>
+  <!-- Eyebrows -->
+  <path d="M30 47 Q38 44 46 47" fill="none" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round"/>
+  <path d="M54 47 Q62 44 70 47" fill="none" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round"/>
+  <!-- Nose -->
+  <path d="M50 55 L46 66 L54 66 Z" fill="#7a5a40" opacity="0.5"/>
+  <ellipse cx="50" cy="65" rx="5" ry="3" fill="#7a5a40" opacity="0.3"/>
+  <!-- Lips -->
+  <path d="M42 72 Q50 70 58 72 L58 75 Q50 78 42 75 Z" fill="#6a4a38"/>
+  <path d="M44 73 Q50 71 56 73" fill="none" stroke="#5a3a28" stroke-width="0.5"/>
+  <!-- Smile lines - friendly -->
+  <path d="M32 58 Q34 62 32 66" stroke="#6a5038" stroke-width="0.5" fill="none"/>
+  <path d="M68 58 Q66 62 68 66" stroke="#6a5038" stroke-width="0.5" fill="none"/>
+  <!-- Ears -->
+  <ellipse cx="23" cy="54" rx="4" ry="8" fill="#7a5a42"/>
+  <ellipse cx="77" cy="54" rx="4" ry="8" fill="#7a5a42"/>
+  <!-- Collar/suit - professional -->
+  <path d="M22 90 L34 80 L50 86 L66 80 L78 90 L82 100 L18 100 Z" fill="#2a2a3a"/>
+  <!-- White shirt -->
+  <path d="M40 82 L50 90 L60 82" fill="#f0f0f0"/>
+  <!-- Tie -->
+  <path d="M47 84 L50 96 L53 84" fill="#4a2a3a"/>
+  <rect x="48" y="82" width="4" height="3" fill="#3a1a2a"/>
+  <!-- Lapels -->
+  <path d="M34 82 L40 86 L40 100 L22 100 L22 90 Z" fill="#2a2a3a"/>
+  <path d="M66 82 L60 86 L60 100 L78 100 L78 90 Z" fill="#2a2a3a"/>
 </svg>

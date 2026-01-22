@@ -1,12 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="50" fill="#4a0e4e"/>
-  <ellipse cx="50" cy="55" rx="30" ry="35" fill="#e8e0d5"/>
-  <circle cx="50" cy="30" rx="35" ry="25" fill="#2d5a27"/>
-  <ellipse cx="35" cy="50" rx="8" ry="5" fill="#1a1a1a"/>
-  <ellipse cx="65" cy="50" rx="8" ry="5" fill="#1a1a1a"/>
-  <circle cx="35" cy="50" r="3" fill="#fff"/>
-  <circle cx="65" cy="50" r="3" fill="#fff"/>
-  <path d="M30 65 Q35 60 40 68 Q50 80 60 68 Q65 60 70 65" fill="#8b0000"/>
-  <path d="M25 55 L30 50" stroke="#1a1a1a" stroke-width="2"/>
-  <path d="M75 55 L70 50" stroke="#1a1a1a" stroke-width="2"/>
+  <defs>
+    <linearGradient id="jokerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d1f4e"/>
+      <stop offset="100%" style="stop-color:#1a0a2e"/>
+    </linearGradient>
+    <linearGradient id="jokerFace" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5f0e8"/>
+      <stop offset="100%" style="stop-color:#d4cfc5"/>
+    </linearGradient>
+    <linearGradient id="jokerHair" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3d7a3d"/>
+      <stop offset="100%" style="stop-color:#1a4a1a"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <circle cx="50" cy="50" r="50" fill="url(#jokerBg)"/>
+  <!-- Hair - wild and messy -->
+  <ellipse cx="50" cy="32" rx="32" ry="22" fill="url(#jokerHair)"/>
+  <ellipse cx="28" cy="38" rx="12" ry="18" fill="url(#jokerHair)" transform="rotate(-20 28 38)"/>
+  <ellipse cx="72" cy="38" rx="12" ry="18" fill="url(#jokerHair)" transform="rotate(20 72 38)"/>
+  <path d="M20 35 Q25 20 35 28" fill="url(#jokerHair)"/>
+  <path d="M80 35 Q75 20 65 28" fill="url(#jokerHair)"/>
+  <!-- Face - white makeup -->
+  <ellipse cx="50" cy="55" rx="28" ry="32" fill="url(#jokerFace)"/>
+  <!-- Eye sockets - dark smudged -->
+  <ellipse cx="38" cy="50" rx="10" ry="7" fill="#1a1a1a" opacity="0.8"/>
+  <ellipse cx="62" cy="50" rx="10" ry="7" fill="#1a1a1a" opacity="0.8"/>
+  <!-- Eyes -->
+  <ellipse cx="38" cy="50" rx="5" ry="4" fill="#3a3a2a"/>
+  <ellipse cx="62" cy="50" rx="5" ry="4" fill="#3a3a2a"/>
+  <circle cx="38" cy="49" r="2" fill="#1a1a1a"/>
+  <circle cx="62" cy="49" r="2" fill="#1a1a1a"/>
+  <circle cx="37" cy="48" r="1" fill="#fff"/>
+  <circle cx="61" cy="48" r="1" fill="#fff"/>
+  <!-- Glasgow smile scars -->
+  <path d="M25 60 Q30 58 35 65 Q42 75 50 72 Q58 75 65 65 Q70 58 75 60" fill="none" stroke="#8b0000" stroke-width="3" stroke-linecap="round"/>
+  <path d="M28 62 Q22 68 18 75" fill="none" stroke="#8b0000" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M72 62 Q78 68 82 75" fill="none" stroke="#8b0000" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Red lipstick smeared -->
+  <ellipse cx="50" cy="68" rx="12" ry="6" fill="#8b0000"/>
+  <!-- Nose -->
+  <path d="M50 55 L48 62 L52 62 Z" fill="#c5b8a8" opacity="0.5"/>
+  <!-- Eyebrow scars -->
+  <path d="M30 42 L36 44" stroke="#6b5555" stroke-width="1.5"/>
+  <path d="M64 44 L70 42" stroke="#6b5555" stroke-width="1.5"/>
 </svg>
