@@ -205,6 +205,7 @@ export default function RoomPage() {
             dealerId={gameState.dealerId}
             onAssignDealer={assignDealer}
             onKickParticipant={kickParticipant}
+            roomId={gameState.roomId}
           />
         </div>
 

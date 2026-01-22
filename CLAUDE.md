@@ -724,3 +724,46 @@ Moderators retain all powers even when set to Observer role:
 - Set/change topic
 - Assign dealer
 - Kick participants
+
+## Room-Based Avatar Assignment
+Date: 2026-01-22
+
+### Overview:
+Upgraded the Batman character avatar system to assign avatars randomly per room without repetition. Each room now has unique character assignments so the same user may appear as different characters in different rooms.
+
+### Changes:
+- `client/src/utils/batmanAvatars.ts`:
+  - Added `getRoomAvatar()` function for room-based avatar selection
+  - Added `getAvatarUrlForRoom()`, `getAvatarColorForRoom()`, `getAvatarNameForRoom()` room-aware functions
+  - Added `clearRoomAvatars()` to clean up room assignments
+  - Implemented seeded shuffle algorithm for deterministic but random assignment
+  - Room avatar assignments stored in memory Maps
+  - Within a room, each user gets a unique character (no repetition up to 10 users)
+  - Updated avatar images to use DiceBear API with character-themed seeds for reliable hosting
+
+- `client/src/components/ParticipantCard.tsx`:
+  - Added `roomId` and `participantIndex` props
+  - Uses room-based avatar functions when roomId is provided
+  - Falls back to legacy hash-based function when no roomId
+
+- `client/src/components/PokerTable.tsx`:
+  - Added `roomId` prop
+  - Creates participant index map for consistent avatar assignment
+  - Passes roomId and participantIndex to all ParticipantCard components
+
+- `client/src/pages/RoomPage.tsx`:
+  - Passes `gameState.roomId` to PokerTable
+
+### How it works:
+1. When a user joins a room, they're assigned an avatar based on their position
+2. The avatar is randomly selected from available (unused) characters
+3. The same user gets the same avatar throughout the room session
+4. Different rooms may assign different characters to the same user
+5. If more than 10 users join, characters are reused
+6. Avatar images are hosted on DiceBear API with character-themed styling
+
+### Avatar Images:
+All avatars now use the DiceBear API for reliable image delivery:
+- Deterministic URLs based on character seeds
+- Character-appropriate styling (colors, accessories, hair)
+- Always available without external hosting concerns

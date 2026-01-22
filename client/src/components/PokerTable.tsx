@@ -11,9 +11,10 @@ interface PokerTableProps {
   dealerId?: string | null;
   onAssignDealer?: (userId: string) => void;
   onKickParticipant?: (userId: string) => void;
+  roomId?: string;
 }
 
-export default function PokerTable({ participants, votes, phase, deckType = 'FIBONACCI', isModerator, dealerId, onAssignDealer, onKickParticipant }: PokerTableProps) {
+export default function PokerTable({ participants, votes, phase, deckType = 'FIBONACCI', isModerator, dealerId, onAssignDealer, onKickParticipant, roomId }: PokerTableProps) {
   const { user } = useAuthStore();
   const isRevealed = phase === 'REVEALED';
 
@@ -22,6 +23,10 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
     const vote = votes.find((v) => v.userId === userId);
     return vote?.value || null;
   };
+
+  // Create a map of userId to their index in the participants array for consistent avatar assignment
+  const participantIndexMap = new Map(participants.map((p, i) => [p.userId, i]));
+  const getParticipantIndex = (userId: string) => participantIndexMap.get(userId) ?? 0;
 
   // Separate voters and observers
   const voters = participants.filter((p) => p.role !== 'OBSERVER');
@@ -75,6 +80,8 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
                   isModeratorView={isModerator}
                   onAssignDealer={onAssignDealer}
                   onKick={onKickParticipant}
+                  roomId={roomId}
+                  participantIndex={getParticipantIndex(participant.userId)}
                 />
               ))}
             </div>
@@ -142,6 +149,8 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
                   isModeratorView={isModerator}
                   onAssignDealer={onAssignDealer}
                   onKick={onKickParticipant}
+                  roomId={roomId}
+                  participantIndex={getParticipantIndex(participant.userId)}
                 />
               ))}
             </div>
@@ -168,6 +177,8 @@ export default function PokerTable({ participants, votes, phase, deckType = 'FIB
                 isCurrentUser={participant.userId === user?.id}
                 isModeratorView={isModerator}
                 onKick={onKickParticipant}
+                roomId={roomId}
+                participantIndex={getParticipantIndex(participant.userId)}
               />
             ))}
           </div>

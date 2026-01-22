@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { Crown, Eye, Check, UserCog, UserX } from 'lucide-react';
 import { Participant, ParticipantRole } from '../types';
-import { getAvatarUrl, getAvatarName } from '../utils/batmanAvatars';
+import { getAvatarUrlForRoom, getAvatarNameForRoom, getAvatarUrl, getAvatarName } from '../utils/batmanAvatars';
 
 interface ParticipantCardProps {
   participant: Participant;
@@ -13,6 +13,8 @@ interface ParticipantCardProps {
   isModeratorView?: boolean;
   onAssignDealer?: (userId: string) => void;
   onKick?: (userId: string) => void;
+  roomId?: string;
+  participantIndex?: number;
 }
 
 // No face card mapping - show actual numbers
@@ -48,6 +50,8 @@ export default function ParticipantCard({
   isModeratorView,
   onAssignDealer,
   onKick,
+  roomId,
+  participantIndex = 0,
 }: ParticipantCardProps) {
   const roleIcons: Record<ParticipantRole, React.ReactNode> = {
     MODERATOR: <Crown className="h-3 w-3 text-yellow-400" />,
@@ -157,8 +161,16 @@ export default function ParticipantCard({
       {/* Avatar */}
       <div className="relative">
         <img
-          src={getAvatarUrl(participant.avatarUrl, participant.userId)}
-          alt={participant.avatarUrl ? participant.displayName : getAvatarName(participant.userId)}
+          src={roomId
+            ? getAvatarUrlForRoom(participant.avatarUrl, roomId, participantIndex, participant.userId)
+            : getAvatarUrl(participant.avatarUrl, participant.userId)
+          }
+          alt={participant.avatarUrl
+            ? participant.displayName
+            : roomId
+              ? getAvatarNameForRoom(roomId, participantIndex, participant.userId)
+              : getAvatarName(participant.userId)
+          }
           className="h-8 w-8 rounded-full border-2 border-slate-600 shadow object-cover"
         />
         {roleIcons[participant.role] && (
