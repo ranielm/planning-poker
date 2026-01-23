@@ -767,3 +767,35 @@ All avatars now use the DiceBear API for reliable image delivery:
 - Deterministic URLs based on character seeds
 - Character-appropriate styling (colors, accessories, hair)
 - Always available without external hosting concerns
+
+## Local Dark Knight Character Images
+Date: 2026-01-22
+
+### Overview:
+Replaced DiceBear API-generated avatars with locally hosted AI-generated character portraits from The Dark Knight trilogy.
+
+### Changes:
+- `client/src/utils/batmanAvatars.ts`:
+  - Replaced inline SVG generation with local image imports
+  - Added imports for 9 character images (jpg/png)
+  - Joker SVG kept from public folder (`/avatars/joker.svg`)
+  - Removed `createAvatarSvg()` function
+
+- `client/src/assets/avatars/`: Added character portrait images:
+  - `batman.jpg` - Christian Bale as Batman
+  - `bane.jpg` - Tom Hardy as Bane
+  - `catwoman.jpg` - Anne Hathaway as Catwoman
+  - `two-face.jpg` - Aaron Eckhart as Two-Face
+  - `alfred.png` - Michael Caine as Alfred
+  - `gordon.png` - Gary Oldman as Commissioner Gordon
+  - `lucius-fox.png` - Morgan Freeman as Lucius Fox
+  - `ras-al-ghul.png` - Liam Neeson as Ra's al Ghul
+  - `scarecrow.png` - Cillian Murphy as Scarecrow
+
+### Why Changed:
+- DiceBear API was being blocked by CORS/CSP policies on Vercel
+- External API dependency caused avatar loading failures
+- Local images ensure reliable, fast loading without network requests
+
+### Summary:
+Avatar images are now bundled with the application, eliminating external API dependencies and ensuring avatars always load correctly regardless of network conditions or security policies.
